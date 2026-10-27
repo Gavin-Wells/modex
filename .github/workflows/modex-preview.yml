@@ -58,6 +58,13 @@ jobs:
           export MODEX_APP_EXECUTABLE="$(find release -path '*/Modex.app/Contents/MacOS/Modex' -type f -print -quit)"
           test -n "$MODEX_APP_EXECUTABLE"
           node test/e2e/modex-packaged-smoke.mjs
+      - name: Save startup failure screenshot
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: modex-startup-failure-${{ matrix.arch }}
+          path: packaged-startup-failure.png
+          if-no-files-found: ignore
       - uses: actions/upload-artifact@v4
         with:
           name: modex-macos-${{ matrix.arch }}-preview

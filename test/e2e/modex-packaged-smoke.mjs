@@ -9,12 +9,26 @@ try {
   const page = await app.firstWindow({ timeout: 120000 });
   const upstream = [];
   const errors = [];
+  const consoleErrors = [];
   page.on('pageerror', (error) => errors.push(error.message));
+  page.on('console', (message) => {
+    if (message.type() === 'error') consoleErrors.push(message.text());
+  });
   page.on('request', (request) => {
     const host = new URL(request.url()).hostname.toLowerCase();
     if (host === 'eigent.ai' || host.endsWith('.eigent.ai') || host.endsWith('.stack-auth.com')) upstream.push(host);
   });
-  await page.getByLabel('账号').waitFor({ timeout: 120000 });
+  try {
+    await page.getByLabel('账号').waitFor({ timeout: 60000 });
+  } catch (error) {
+    console.error('Window URL:', page.url());
+    console.error('Page text:', (await page.locator('body').innerText().catch(() => '')).slice(0, 3000));
+    console.error('Page errors:', JSON.stringify(errors));
+    console.error('Console errors:', JSON.stringify(consoleErrors));
+    console.error('Windows:', app.windows().map((item) => item.url()));
+    await page.screenshot({ path: 'packaged-startup-failure.png' }).catch(() => {});
+    throw error;
+  }
   await page.getByRole('button', { name: '登录', exact: true }).waitFor({ timeout: 120000 });
   await page.waitForFunction(() => {
     const button = [...document.querySelectorAll('button')].find((item) => item.textContent?.trim() === '登录');
