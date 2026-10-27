@@ -1,3 +1,4 @@
+# Modified to isolate Modex local data.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +17,7 @@
 
 Layout:
 
-    ~/.eigent/memory/
+    ~/.modex/memory/
       users/{canonical_user_id}/
         spaces/{space_id}/
           projects/{project_id}/
@@ -38,7 +39,7 @@ from pathlib import Path
 def memory_root() -> Path:
     """Top-level memory directory. Not created on import (lazy)."""
 
-    return Path.home() / ".eigent" / "memory"
+    return Path.home() / ".modex" / "memory"
 
 
 def canonical_user_id(

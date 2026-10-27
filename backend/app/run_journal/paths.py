@@ -1,3 +1,4 @@
+# Modified to isolate Modex local data.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,4 +21,4 @@ from pathlib import Path
 def default_run_journal_path() -> Path:
     """Return the default database path without touching the filesystem."""
 
-    return Path.home() / ".eigent" / "run-journal.sqlite3"
+    return Path.home() / ".modex" / "run-journal.sqlite3"
