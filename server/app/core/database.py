@@ -1,3 +1,4 @@
+# Modified for Modex SQLite connections.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +18,7 @@ import logging
 from collections.abc import Callable
 
 from sqlalchemy.engine import make_url
+from sqlalchemy import event
 from sqlmodel import Session, create_engine
 
 from app.core.environment import env, env_or_fail
@@ -81,6 +83,24 @@ engine = create_engine(
     pool_reset_on_return="rollback",
     connect_args=_database_connect_args(database_url),
 )
+
+
+def configure_sqlite_connections(target_engine) -> None:
+    """Enable integrity checks and bounded write waits for each SQLite connection."""
+    if target_engine.url.get_backend_name() != "sqlite":
+        return
+
+    @event.listens_for(target_engine, "connect")
+    def _set_sqlite_pragmas(dbapi_connection, _connection_record):
+        cursor = dbapi_connection.cursor()
+        try:
+            cursor.execute("PRAGMA foreign_keys=ON")
+            cursor.execute("PRAGMA busy_timeout=5000")
+        finally:
+            cursor.close()
+
+
+configure_sqlite_connections(engine)
 
 logger.info("Database engine initialized successfully")
 

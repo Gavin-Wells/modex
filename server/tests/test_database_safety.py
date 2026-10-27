@@ -3,10 +3,13 @@ from __future__ import annotations
 import asyncio
 import os
 import time
+import pytest
 
 os.environ.setdefault("database_url", "sqlite:///test.db")
 
 from app.core import database
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import IntegrityError
 
 
 def test_postgres_connections_have_bounded_waits(monkeypatch):
@@ -25,6 +28,21 @@ def test_postgres_connections_have_bounded_waits(monkeypatch):
 
 def test_non_postgres_connections_do_not_receive_libpq_options():
     assert database._database_connect_args("sqlite:///test.db") == {}
+
+
+def test_sqlite_connections_enforce_foreign_keys_and_have_a_busy_timeout(tmp_path):
+    engine = create_engine(f"sqlite:///{tmp_path / 'workspace.db'}")
+    database.configure_sqlite_connections(engine)
+    try:
+        with engine.connect() as connection:
+            assert connection.execute(text("PRAGMA foreign_keys")).scalar_one() == 1
+            assert connection.execute(text("PRAGMA busy_timeout")).scalar_one() == 5000
+            connection.execute(text("CREATE TABLE parent (id INTEGER PRIMARY KEY)"))
+            connection.execute(text("CREATE TABLE child (parent_id INTEGER REFERENCES parent(id))"))
+            with pytest.raises(IntegrityError):
+                connection.execute(text("INSERT INTO child (parent_id) VALUES (42)"))
+    finally:
+        engine.dispose()
 
 
 def test_async_session_work_does_not_block_event_loop(monkeypatch):
