@@ -43,6 +43,7 @@ DEFAULT_ALLOW_HEADERS = [
     "X-Remote-Control-Token",
     "X-Trace-Id",
     "X-Requested-With",
+    "X-Modex-Workspace-Capability",
 ]
 
 

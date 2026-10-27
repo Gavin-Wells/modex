@@ -594,6 +594,19 @@ async function proxyFetchRequest(
     ...customHeaders,
   };
 
+  if (
+    !import.meta.env.DEV &&
+    import.meta.env.VITE_USE_LOCAL_PROXY === 'true' &&
+    url.startsWith('/api/v1/user/modelswitch-')
+  ) {
+    const ipc = createHost().ipcRenderer;
+    const capability = await ipc?.invoke('workspace-service:get-capability');
+    if (typeof capability !== 'string' || capability.length < 32) {
+      throw new Error('Local workspace authorization is not available');
+    }
+    headers['X-Modex-Workspace-Capability'] = capability;
+  }
+
   if (!url.includes('http://') && !url.includes('https://') && token) {
     headers['Authorization'] = `Bearer ${token}`;
   }

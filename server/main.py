@@ -37,12 +37,16 @@ from app.core.babel import babel_configs
 from app.core.environment import auto_include_routers, env
 from app.shared.exception.handlers import register_exception_handlers
 from app.shared.middleware import TraceIDMiddleware, get_cors_middleware
+from app.shared.middleware.modex_capability import ModexCapabilityMiddleware
 from app.shared.logging import trace_filter
 
 # Register exception handlers and i18n middleware
 register_exception_handlers(api)
 api.add_middleware(BabelMiddleware, babel_configs=babel_configs)
 api.add_middleware(CORSMiddleware, **get_cors_middleware())
+workspace_capability = os.environ.pop("MODEX_WORKSPACE_CAPABILITY", "")
+if workspace_capability:
+    api.add_middleware(ModexCapabilityMiddleware, capability=workspace_capability)
 
 std_logger = logging.getLogger("server_main")
 
