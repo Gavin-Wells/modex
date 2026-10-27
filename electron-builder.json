@@ -97,11 +97,11 @@
       "releaseType": "release"
     }
   ],
-  "icon": "build/icon.ico",
+  "icon": "build/modex.png",
   "afterPack": "./config/before-sign.cjs",
   "afterSign": "./config/notarize.cjs",
   "mac": {
-    "icon": "build/icon.icns",
+    "icon": "build/modex.png",
     "target": ["dmg", "zip"],
     "entitlements": "entitlements.mac.plist",
     "entitlementsInherit": "entitlements.mac.plist",
@@ -151,7 +151,7 @@
     }
   },
   "dmg": {
-    "background": "src/assets/dmg-background.png",
+    "backgroundColor": "#f4f7f6",
     "window": {
       "width": 660,
       "height": 400
@@ -163,7 +163,7 @@
     ]
   },
   "win": {
-    "icon": "build/icon.ico",
+    "icon": "build/modex.png",
     "artifactName": "${productName}.Setup.${version}.exe",
     "target": [
       {
@@ -173,7 +173,7 @@
     ]
   },
   "linux": {
-    "icon": "build/icon.png",
+    "icon": "build/modex.png",
     "target": ["AppImage"],
     "category": "Development"
   },
@@ -183,9 +183,6 @@
     "allowElevation": true,
     "allowToChangeInstallationDirectory": true,
     "deleteAppDataOnUninstall": false,
-    "installerIcon": "build/icon.ico",
-    "uninstallerIcon": "build/icon.ico",
-    "installerHeaderIcon": "build/icon.ico",
     "include": "build/installer.nsh"
   }
 }

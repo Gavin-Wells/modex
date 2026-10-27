@@ -3145,7 +3145,7 @@ async function createWindowInternal() {
     // macOS-specific title bar styling
     titleBarStyle: isMac ? 'hidden' : undefined,
     trafficLightPosition: isMac ? { x: 10, y: 12 } : undefined,
-    icon: path.join(VITE_PUBLIC, 'favicon.ico'),
+    icon: path.join(VITE_PUBLIC, 'modex.png'),
     // Rounded corners on macOS and Linux (as original)
     roundedCorners: !isWindows,
     // Keep the Windows/Linux menu discoverable through Alt without changing
