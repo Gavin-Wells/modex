@@ -1,3 +1,4 @@
+# Modified for Modex SQLite migration compatibility.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -275,7 +276,7 @@ def upgrade() -> None:
         """
         INSERT INTO user_id_canonicalization (source, source_id, canonical_id, created_at, updated_at)
         SELECT DISTINCT 'chat_history', CAST(user_id AS TEXT), CAST(user_id AS TEXT), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-        FROM chat_history
+        FROM chat_history WHERE 1 = 1
         ON CONFLICT (source, source_id) DO NOTHING
         """
     )
@@ -283,13 +284,24 @@ def upgrade() -> None:
         """
         INSERT INTO user_id_canonicalization (source, source_id, canonical_id, created_at, updated_at)
         SELECT DISTINCT 'trigger', CAST(user_id AS TEXT), CAST(user_id AS TEXT), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-        FROM trigger
+        FROM trigger WHERE 1 = 1
         ON CONFLICT (source, source_id) DO NOTHING
         """
     )
 
+    sqlite = op.get_bind().dialect.name == "sqlite"
+    legacy_space_json = (
+        "json_object('legacy', json('true'), 'schemaVersion', 1)"
+        if sqlite else "json_build_object('legacy', true, 'schemaVersion', 1)"
+    )
+    legacy_project_json = (
+        "json_object('legacy', json('true'), 'legacyAlias', legacy_project_id)"
+        if sqlite else "json_build_object('legacy', true, 'legacyAlias', legacy_project_id)"
+    )
+    legacy_json = "json_object('legacy', json('true'))" if sqlite else "json_build_object('legacy', true)"
+
     op.execute(
-        """
+        f"""
         INSERT INTO space (
             id, user_id, name, description, source_type, status, schema_version, metadata, created_at, updated_at
         )
@@ -301,18 +313,18 @@ def upgrade() -> None:
             'legacy',
             'active',
             1,
-            json_build_object('legacy', true, 'schemaVersion', 1),
+            {legacy_space_json},
             CURRENT_TIMESTAMP,
             CURRENT_TIMESTAMP
         FROM (
             SELECT DISTINCT canonical_id FROM user_id_canonicalization
-        ) users
+        ) users WHERE 1 = 1
         ON CONFLICT (id) DO NOTHING
         """
     )
 
     op.execute(
-        """
+        f"""
         WITH backfill_source AS (
             SELECT
                 CAST(user_id AS TEXT) AS user_id,
@@ -368,12 +380,12 @@ def upgrade() -> None:
             'active',
             'artifact-only',
             CASE
-                WHEN user_count > 1 THEN json_build_object('legacy', true, 'legacyAlias', legacy_project_id)
-                ELSE json_build_object('legacy', true)
+                WHEN user_count > 1 THEN {legacy_project_json}
+                ELSE {legacy_json}
             END,
             CURRENT_TIMESTAMP,
             CURRENT_TIMESTAMP
-        FROM resolved
+        FROM resolved WHERE 1 = 1
         ON CONFLICT (id) DO NOTHING
         """
     )

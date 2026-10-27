@@ -1,5 +1,7 @@
 """add self-hosted durable remote command control
 
+Modified for Modex SQLite migration compatibility.
+
 Revision ID: add_self_hosted_rc_control
 Revises: add_rc_space_scope
 Create Date: 2026-08-27 12:00:00
@@ -31,11 +33,11 @@ def upgrade() -> None:
         "remote_control_command",
         sa.Column("interaction_decision_key", sa.String(length=64), nullable=True),
     )
-    op.create_unique_constraint(
-        "uq_remote_control_command_session_request",
-        "remote_control_command",
-        ["session_id", "client_request_id"],
-    )
+    with op.batch_alter_table("remote_control_command") as batch_op:
+        batch_op.create_unique_constraint(
+            "uq_remote_control_command_session_request",
+            ["session_id", "client_request_id"],
+        )
     op.create_index(
         "uq_remote_control_command_interaction_decision_key",
         "remote_control_command",
@@ -57,7 +59,7 @@ def upgrade() -> None:
         sa.Column("app_version", sa.String(length=64), nullable=True),
         sa.Column(
             "capabilities",
-            postgresql.JSONB(astext_type=sa.Text()),
+            sa.JSON().with_variant(postgresql.JSONB(astext_type=sa.Text()), "postgresql"),
             nullable=False,
         ),
         sa.Column(
@@ -259,12 +261,14 @@ def upgrade() -> None:
             "expires_at",
         ],
         postgresql_where=sa.text("receipt_state = 'pending'"),
+        sqlite_where=sa.text("receipt_state = 'pending'"),
     )
     op.create_index(
         "ix_remote_command_receipt_expiry",
         "remote_command_state",
         ["receipt_grace_until", "lease_until"],
         postgresql_where=sa.text("receipt_state = 'pending'"),
+        sqlite_where=sa.text("receipt_state = 'pending'"),
     )
     op.create_index(
         "ix_remote_command_state_project_created",
@@ -280,7 +284,7 @@ def upgrade() -> None:
         sa.Column("desktop_event_sequence", sa.BigInteger(), nullable=True),
         sa.Column("server_recorded_version", sa.BigInteger(), nullable=True),
         sa.Column("event_type", sa.String(length=64), nullable=False),
-        sa.Column("payload", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column("payload", sa.JSON().with_variant(postgresql.JSONB(astext_type=sa.Text()), "postgresql"), nullable=False),
         sa.Column("occurred_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column(
             "created_at",
@@ -369,12 +373,14 @@ def upgrade() -> None:
         "remote_command_notification_outbox",
         ["available_at", "lease_until", "session_id"],
         postgresql_where=sa.text("status = 'pending'"),
+        sqlite_where=sa.text("status = 'pending'"),
     )
     op.create_index(
         "ix_remote_command_notification_published",
         "remote_command_notification_outbox",
         ["published_at"],
         postgresql_where=sa.text("status = 'published'"),
+        sqlite_where=sa.text("status = 'published'"),
     )
 
 
@@ -417,11 +423,8 @@ def downgrade() -> None:
         "uq_remote_control_command_interaction_decision_key",
         table_name="remote_control_command",
     )
-    op.drop_constraint(
-        "uq_remote_control_command_session_request",
-        "remote_control_command",
-        type_="unique",
-    )
+    with op.batch_alter_table("remote_control_command") as batch_op:
+        batch_op.drop_constraint("uq_remote_control_command_session_request", type_="unique")
     op.drop_column("remote_control_command", "interaction_decision_key")
     op.drop_column("remote_control_command", "request_fingerprint")
     op.drop_column("remote_control_command", "client_request_id")
