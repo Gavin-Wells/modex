@@ -2,6 +2,15 @@ name: Modex macOS preview
 
 on:
   workflow_dispatch:
+    inputs:
+      arch:
+        description: Architecture to build
+        type: choice
+        options:
+          - all
+          - arm64
+          - x64
+        default: all
 
 permissions:
   contents: read
@@ -11,11 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: macos-15-intel
-            arch: x64
-          - os: macos-14
-            arch: arm64
+        include: ${{ fromJSON(inputs.arch == 'arm64' && '[{"os":"macos-14","arch":"arm64","target":"dmg"}]' || inputs.arch == 'x64' && '[{"os":"macos-15-intel","arch":"x64","target":"zip"}]' || '[{"os":"macos-15-intel","arch":"x64","target":"zip"},{"os":"macos-14","arch":"arm64","target":"dmg"}]') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     steps:
@@ -50,7 +55,7 @@ jobs:
           export MODEX_TEST_WORKSPACE_REDIS="$PWD/resources/prebuilt/redis/redis-server"
           export MODEX_TEST_WORKSPACE_SERVER="$PWD/server"
           npm test -- --run test/unit/workspaceServiceManager.test.ts test/unit/workspaceServiceVerify.test.ts
-      - run: npx electron-builder --mac dmg --${{ matrix.arch }} --publish never
+      - run: npx electron-builder --mac ${{ matrix.target }} --${{ matrix.arch }} --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       - name: Verify packaged application startup
@@ -68,6 +73,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: modex-macos-${{ matrix.arch }}-preview
-          path: release/*.dmg
+          path: release/*.${{ matrix.target }}
           if-no-files-found: error
           retention-days: 7
