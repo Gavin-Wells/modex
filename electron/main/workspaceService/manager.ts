@@ -118,22 +118,23 @@ export class WorkspaceServiceManager {
       { mode: 0o600, flag: 'wx' }
     );
     try {
-      this.redis = spawn(this.paths.redis, [this.redisConfig], {
+      const redis = spawn(this.paths.redis, [this.redisConfig], {
         stdio: 'ignore',
-        env: { PATH: process.env.PATH || '' },
+        env: { PATH: process.env.PATH || '' } as NodeJS.ProcessEnv,
       });
-      this.redis.on('error', () => {});
+      this.redis = redis;
+      redis.on('error', () => {});
       const redisDeadline = Date.now() + 15000;
       while (
         Date.now() < redisDeadline &&
-        isRunning(this.redis) &&
+        isRunning(redis) &&
         !(await canConnect(redisPort))
       ) {
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
-      if (!isRunning(this.redis) || !(await canConnect(redisPort)))
+      if (!isRunning(redis) || !(await canConnect(redisPort)))
         throw new Error('Local Redis failed to start');
-      this.service = spawn(this.paths.python, ['modex_local.py'], {
+      const service = spawn(this.paths.python, ['modex_local.py'], {
         cwd: this.paths.serverDir,
         stdio: 'ignore',
         env: {
@@ -145,13 +146,10 @@ export class WorkspaceServiceManager {
           MODEX_WORKSPACE_CAPABILITY: this.capability,
         },
       });
-      this.service.on('error', () => {});
+      this.service = service;
+      service.on('error', () => {});
       const deadline = Date.now() + 60000;
-      while (
-        Date.now() < deadline &&
-        isRunning(this.service) &&
-        isRunning(this.redis)
-      ) {
+      while (Date.now() < deadline && isRunning(service) && isRunning(redis)) {
         if (await verifyWorkspaceService(servicePort, this.capability)) {
           this.endpoint = `http://127.0.0.1:${servicePort}`;
           return;
