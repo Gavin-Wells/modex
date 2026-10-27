@@ -1,3 +1,4 @@
+// Modified for Modex local service configuration.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,7 +42,7 @@ import {
 
 const execAsync = promisify(exec);
 
-const DEFAULT_SERVER_URL = 'https://dev.eigent.ai';
+const DEFAULT_SERVER_URL = 'http://127.0.0.1:3001';
 // Starts after the backend process is spawned; uv/Python dependency repair runs before this.
 const BACKEND_READY_TIMEOUT_MS = 5 * 60 * 1000;
 const BACKEND_HEALTH_CHECK_INTERVAL_MS = 1000;
@@ -316,9 +317,11 @@ export async function startBackend(
     }
   }
 
-  const serverUrl = resolvedServerUrl || DEFAULT_SERVER_URL;
+  // This preview only supports the local Modex service; never inherit a
+  // cloud endpoint from another installation's global configuration.
+  const serverUrl = DEFAULT_SERVER_URL;
   log.info(
-    `Backend SERVER_URL resolved to: ${serverUrl} (source: ${resolvedSource})`
+    `Backend SERVER_URL resolved to: ${serverUrl} (local Modex; ignored ${resolvedSource})`
   );
 
   // Ensure prebuilt terminal venv is copied to ~/.eigent/venvs for terminal toolkit

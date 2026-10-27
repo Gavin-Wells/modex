@@ -1,3 +1,4 @@
+// Modified for Modex branding.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,7 +31,6 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import background from '@/assets/custom/background.png';
-import eigentLogo from '@/assets/logo/eigent_icon.png';
 
 const IS_LOCAL_MODE = import.meta.env.VITE_USE_LOCAL_PROXY === 'true';
 let lock = false;
@@ -346,12 +346,11 @@ export default function Login() {
   // Render local mode: "Start Eigent" button only
   const renderLocalMode = () => (
     <div className="relative flex w-80 flex-1 flex-col items-center justify-center pt-8">
-      <img
-        src={eigentLogo}
-        className="absolute top-10 left-1/2 h-16 w-16 -translate-x-1/2"
-      />
+      <div className="absolute top-10 left-1/2 -translate-x-1/2 text-ds-text-title font-bold">
+        M
+      </div>
       <div className="mb-8 text-ds-text-display font-bold text-ds-ink-default-default">
-        Eigent
+        Modex
       </div>
       {generalError && (
         <p className="mt-1 mb-4 text-ds-text-body-large text-ds-text-status-error-strong-default">
@@ -366,9 +365,7 @@ export default function Login() {
         disabled={isLoading}
       >
         <span className="flex-1">
-          {isLoading
-            ? t('layout.logging-in')
-            : t('layout.start-eigent', { defaultValue: 'Start Eigent' })}
+          {isLoading ? t('layout.logging-in') : '启动 Modex'}
         </span>
       </Button>
     </div>
@@ -377,10 +374,9 @@ export default function Login() {
   // Render hybrid/app mode: waiting for external login callback
   const renderHybridMode = () => (
     <div className="relative flex w-80 flex-1 flex-col items-center justify-center pt-8">
-      <img
-        src={eigentLogo}
-        className="absolute top-10 left-1/2 h-16 w-16 -translate-x-1/2"
-      />
+      <div className="absolute top-10 left-1/2 -translate-x-1/2 text-ds-text-title font-bold">
+        M
+      </div>
       <div className="mb-4 text-ds-text-display font-bold text-ds-ink-default-default">
         {t('layout.login')}
       </div>

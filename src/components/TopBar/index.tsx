@@ -1,3 +1,4 @@
+// Modified for ModelSwitch integration.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +18,7 @@ import eigentAppIconBlack from '@/assets/logo/icon_black.svg';
 import eigentAppIconWhite from '@/assets/logo/icon_white.svg';
 import NewSpaceDialog from '@/components/Home/NewSpaceDialog';
 import { useAppCommand } from '@/components/Layout/AppCommandProvider';
+import { ModelSwitchTerminal } from '@/components/ModelSwitch/ModelSwitchTerminal';
 import { SpaceSwitchDropdown } from '@/components/SpaceSidebar/SpaceSwitchDropdown';
 import {
   TOP_BAR_CONTROL_SELECTED_CLASS,
@@ -72,6 +74,7 @@ import {
   PanelLeft,
   PanelLeftOpen,
   Square,
+  TerminalSquare,
   X,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -93,6 +96,7 @@ function HeaderWin() {
   const [renameSpaceValue, setRenameSpaceValue] = useState('');
   const [renamingSpace, setRenamingSpace] = useState(false);
   const [versionHistoryOpen, setVersionHistoryOpen] = useState(false);
+  const [modelSwitchOpen, setModelSwitchOpen] = useState(false);
   const [switchingSpaceId, setSwitchingSpaceId] = useState<string | null>(null);
   const projectStore = useProjectRuntimeStore();
   const activeSpaceId = useSpaceStore((s) => s.activeSpaceId);
@@ -492,6 +496,10 @@ function HeaderWin() {
         onStartFromScratch={handleCreateBlankSpace}
         onUseLocalFolder={handleCreateSpaceFromFolder}
       />
+      <ModelSwitchTerminal
+        open={modelSwitchOpen}
+        onOpenChange={setModelSwitchOpen}
+      />
       <AlertDialog
         isOpen={renameSpaceDialogOpen}
         onClose={() => setRenameSpaceDialogOpen(false)}
@@ -689,6 +697,25 @@ function HeaderWin() {
             platform === 'darwin' && 'px-0'
           )}
         >
+          {host?.electronAPI && (
+            <TooltipSimple
+              content="Claude Code / Codex"
+              side="bottom"
+              align="center"
+              variant="instant"
+            >
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                buttonContent="icon-only"
+                aria-label="Claude Code / Codex"
+                onClick={() => setModelSwitchOpen(true)}
+              >
+                <DsIcon icon={TerminalSquare} aria-hidden />
+              </Button>
+            </TooltipSimple>
+          )}
           <UpdateButton />
           <TooltipSimple
             content={t('layout.support')}

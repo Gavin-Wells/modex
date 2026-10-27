@@ -1,3 +1,4 @@
+// Modified for ModelSwitch integration.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -55,6 +56,7 @@ export interface ShellTerminalProps {
   shellId: string;
   /** Directory the shell starts in; falls back to the home directory. */
   cwd?: string;
+  modelswitch?: { tool: 'claude' | 'codex'; apiKey: string; model: string };
   /** Hold the cached terminal size while the display panel animates. */
   viewportSettled?: boolean;
   /** Called with the URL when a link in the output is clicked. */
@@ -70,6 +72,7 @@ export interface ShellTerminalProps {
 export function ShellTerminal({
   shellId,
   cwd,
+  modelswitch,
   viewportSettled = true,
   onOpenLink,
 }: ShellTerminalProps) {
@@ -185,6 +188,7 @@ export function ShellTerminal({
         cwd,
         cols: terminal.cols,
         rows: terminal.rows,
+        modelswitch,
       }).then((next) => {
         if (!disposed) setSession(next);
       });

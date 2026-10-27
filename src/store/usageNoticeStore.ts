@@ -1,3 +1,4 @@
+// Modified for Modex support links.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -92,13 +93,10 @@ export function setUsageAccount(account: string | null) {
 }
 
 export function contactSupport() {
-  const url = 'mailto:support@eigent.ai';
-  const openMailto = createHost().electronAPI?.openMailto;
-  if (openMailto)
-    void openMailto(url).catch(() => {
-      window.location.href = url;
-    });
-  else window.location.href = url;
+  const url = 'https://modelswitch.org';
+  const openExternal = createHost().electronAPI?.openExternal;
+  if (openExternal) void openExternal(url);
+  else window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 export function acknowledgeUsageNotice() {

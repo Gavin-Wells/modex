@@ -1,3 +1,4 @@
+// Modified for ModelSwitch integration.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +19,7 @@ import type { IPty } from 'node-pty';
 import fs from 'node:fs';
 import os from 'node:os';
 import kill from 'tree-kill';
+import { cliLaunchOptions, type ModelSwitchLaunch } from './modelswitchCli';
 import { TerminalProcessTree } from './terminalProcessTree';
 
 /**
@@ -110,6 +112,7 @@ export interface TerminalCreateOptions {
   cwd?: string;
   cols?: number;
   rows?: number;
+  modelswitch?: ModelSwitchLaunch;
 }
 
 async function createTerminalSession(
@@ -128,15 +131,21 @@ async function createTerminalSession(
     return { success: false, error: 'Terminal creation was cancelled' };
   }
 
-  const { file, args } = defaultShell();
   const workingDir = cwd && fs.existsSync(cwd) ? cwd : os.homedir();
   try {
+    if (options.modelswitch && (!cwd || !fs.statSync(cwd).isDirectory())) {
+      throw new Error('Selected project folder is unavailable');
+    }
+    const launch = options.modelswitch
+      ? cliLaunchOptions(options.modelswitch)
+      : null;
+    const { file, args } = launch ?? defaultShell();
     const terminal = pty.spawn(file, args, {
       name: 'xterm-256color',
       cols: cols || 80,
       rows: rows || 24,
       cwd: workingDir,
-      env: terminalEnvironment(),
+      env: { ...terminalEnvironment(), ...launch?.env },
     });
     session.pty = terminal;
     if (process.platform !== 'win32') {
@@ -265,7 +274,7 @@ export function registerTerminalIpcHandlers() {
   ipcMain.handle(
     'terminal-create',
     async (event, options: TerminalCreateOptions) => {
-      const { id, cwd, cols, rows } = options ?? {};
+      const { id, cwd, cols, rows, modelswitch } = options ?? {};
       if (!id) return { success: false, error: 'Missing terminal id' };
       if (shuttingDown)
         return { success: false, error: 'Terminal creation was cancelled' };
@@ -297,6 +306,7 @@ export function registerTerminalIpcHandlers() {
         cwd,
         cols,
         rows,
+        modelswitch,
       });
       return session.creation;
     }

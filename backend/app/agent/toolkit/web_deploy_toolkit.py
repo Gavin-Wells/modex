@@ -1,3 +1,4 @@
+# Modified for Modex: upstream deployment is disabled.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,9 +33,9 @@ class WebDeployToolkit(BaseWebDeployToolkit, AbstractToolkit):
         timeout: float | None = None,
         add_branding_tag: bool = True,
         logo_path: str = "../../../../public/favicon.png",
-        tag_text: str = "Created by Eigent",
-        tag_url: str = "https://main.eigent.ai/",
-        remote_server_ip: str | None = "space.eigent.ai",
+        tag_text: str = "Created by Modex",
+        tag_url: str = "https://modelswitch.org/",
+        remote_server_ip: str | None = None,
         remote_server_port: int = 8080,
     ):
         self.api_task_id = api_task_id
@@ -57,11 +58,7 @@ class WebDeployToolkit(BaseWebDeployToolkit, AbstractToolkit):
         to Agents until the remote service has a working folder contract.
         """
 
-        return [
-            tool
-            for tool in super().get_tools()
-            if tool.get_function_name() != "deploy_folder"
-        ]
+        return []
 
     @listen_toolkit(BaseWebDeployToolkit.deploy_html_content)
     def deploy_html_content(

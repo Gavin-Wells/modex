@@ -1,3 +1,4 @@
+// Modified for Modex branding.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +13,8 @@
 // limitations under the License.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
-export const DESKTOP_LOGIN_CALLBACK_URL = 'eigent://auth/callback';
-const DEFAULT_SITE_URL = 'https://www.eigent.ai';
+export const DESKTOP_LOGIN_CALLBACK_URL = 'modex://auth/callback';
+const DEFAULT_SITE_URL = 'https://modelswitch.org';
 const SITE_URL = import.meta.env.VITE_SITE_URL || DEFAULT_SITE_URL;
 
 export function getWebLoginCallbackUrl(origin: string): string {

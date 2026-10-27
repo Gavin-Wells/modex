@@ -1,3 +1,4 @@
+// Modified for Modex local service configuration.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,6 +35,13 @@ try {
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
+  process.env.VITE_USE_LOCAL_PROXY = 'true';
+  process.env.VITE_PROXY_URL = 'http://127.0.0.1:3001';
+  process.env.VITE_SITE_URL = 'https://modelswitch.org';
+  process.env.VITE_BASE_URL = '/api';
+  process.env.VITE_STACK_PROJECT_ID = '';
+  process.env.VITE_STACK_PUBLISHABLE_CLIENT_KEY = '';
+  process.env.VITE_STACK_SECRET_SERVER_KEY = '';
   const isServe = command === 'serve';
   const isBuild = command === 'build';
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG;

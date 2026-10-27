@@ -1,3 +1,4 @@
+// Modified for Modex: upstream OAuth callback disabled.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +23,8 @@ const EnvOauthInfoMap = {
 const getElectronAPI = () => createHost().electronAPI;
 
 export class OAuth {
-  public client_name: string = 'Eigent';
-  public client_uri: string = 'https://eigent.ai/';
+  public client_name: string = 'Modex';
+  public client_uri: string = 'https://modelswitch.org/';
   public redirect_uris: string[] = [];
 
   public url: string = '';
@@ -44,25 +45,7 @@ export class OAuth {
   }
 
   async startOauth(mcpName: string) {
-    const mcp = mcpMap[mcpName as keyof typeof mcpMap];
-    if (!mcp) throw new Error(`MCP ${mcpName} not found`);
-
-    this.url = mcp.url;
-    this.provider = mcp.provider;
-    this.redirect_uris = [
-      `https://dev.eigent.ai/api/v1/oauth/${this.provider}/callback`,
-    ];
-    this.authServerUrl = new URL(mcp.url).origin;
-    this.resourcePath = mcp?.resourcePath || this.resourcePath;
-    this.authorizationServerPath =
-      mcp?.authorizationServerPath || this.authorizationServerPath;
-
-    this.resourceMetadata = await this.getResourceMetadata();
-    this.authorizationServerMetadata =
-      await this.getAuthorizationServerMetadata();
-    this.registerClientData = await this.clientRegistration();
-    const oauthUrl = await this.generateAuthUrl();
-    window.location.href = oauthUrl;
+    throw new Error(`Connector OAuth is not yet configured for ${mcpName}`);
   }
 
   async getResourceMetadata() {

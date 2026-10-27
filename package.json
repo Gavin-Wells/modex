@@ -1,10 +1,10 @@
 {
-  "name": "eigent",
-  "version": "1.0.6",
+  "name": "modex",
+  "version": "0.1.0",
   "main": "dist-electron/main/index.js",
-  "description": "Eigent",
-  "author": "Eigent.AI",
-  "license": "MIT",
+  "description": "Modex desktop workspace",
+  "author": "ModelSwitch",
+  "license": "Apache-2.0",
   "private": true,
   "debug": {
     "env": {

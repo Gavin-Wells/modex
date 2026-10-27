@@ -1,3 +1,4 @@
+// Modified for Modex branding.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -819,16 +820,16 @@ if (!app.requestSingleInstanceLock()) {
 // ==================== protocol config ====================
 const setupProtocolHandlers = () => {
   if (process.env.NODE_ENV === 'development') {
-    const isDefault = app.isDefaultProtocolClient('eigent', process.execPath, [
+    const isDefault = app.isDefaultProtocolClient('modex', process.execPath, [
       path.resolve(process.argv[1]),
     ]);
     if (!isDefault) {
-      app.setAsDefaultProtocolClient('eigent', process.execPath, [
+      app.setAsDefaultProtocolClient('modex', process.execPath, [
         path.resolve(process.argv[1]),
       ]);
     }
   } else {
-    app.setAsDefaultProtocolClient('eigent');
+    app.setAsDefaultProtocolClient('modex');
   }
 };
 
@@ -985,7 +986,7 @@ const setupSingleInstanceLock = () => {
   // to register the event handlers.
   app.on('second-instance', (event, argv) => {
     log.info('second-instance', argv);
-    const url = argv.find((arg) => arg.startsWith('eigent://'));
+    const url = argv.find((arg) => arg.startsWith('modex://'));
     if (url) handleProtocolUrl(url);
     if (win) win.show();
   });
@@ -3147,7 +3148,7 @@ async function createWindowInternal() {
   appShellReadinessGate.markDocumentLoading();
   rendererAppCommands.markNotReady('window-created');
   win = new BrowserWindow({
-    title: 'Eigent',
+    title: 'Modex',
     ...startupWindowState.bounds,
     minWidth: startupWindowState.minimumSize.width,
     minHeight: startupWindowState.minimumSize.height,

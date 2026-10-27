@@ -1,3 +1,4 @@
+// Modified for ModelSwitch integration.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -268,12 +269,13 @@ export const INIT_PROVODERS: Provider[] = [
   },
   {
     id: 'openai-compatible-model',
-    name: 'OpenAI Compatible',
+    name: 'ModelSwitch / OpenAI Compatible',
     apiKey: '',
-    apiHost: '',
+    apiHost: 'https://api.modelswitch.org/v1',
     description: 'OpenAI-compatible API endpoint configuration.',
-    hostPlaceHolder: 'e.g. https://api.x.ai/v1',
+    hostPlaceHolder: 'https://api.modelswitch.org/v1',
     is_valid: false,
-    model_type: '',
+    model_type: 'gpt-6.1-sol',
+    modelsEndpoint: '/models',
   },
 ];

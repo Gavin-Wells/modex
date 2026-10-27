@@ -1,3 +1,4 @@
+// Modified for Modex protocol.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +23,7 @@ export const share = async (taskId: string) => {
     const res = await proxyFetchPost(`/api/v1/chat/share`, {
       task_id: taskId,
     });
-    const shareLink = `${import.meta.env.VITE_USE_LOCAL_PROXY === 'true' ? 'eigent://callback' : `${SITE_URL}/download`}?share_token=${res.share_token}__${taskId}`;
+    const shareLink = `${import.meta.env.VITE_USE_LOCAL_PROXY === 'true' ? 'modex://callback' : `${SITE_URL}/download`}?share_token=${res.share_token}__${taskId}`;
     navigator.clipboard
       .writeText(shareLink)
       .then(() => {

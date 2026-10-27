@@ -1,3 +1,4 @@
+// Modified for Modex branding.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +14,7 @@
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 export const SITE_URL =
-  import.meta.env.VITE_SITE_URL || 'https://www.eigent.ai';
+  import.meta.env.VITE_SITE_URL || 'https://modelswitch.org';
 
 export function getProxyBaseURL() {
   const isDev = import.meta.env.DEV;

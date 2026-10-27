@@ -1,3 +1,4 @@
+// Modified for ModelSwitch integration.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -343,6 +344,7 @@ interface ElectronAPI {
     cwd?: string;
     cols?: number;
     rows?: number;
+    modelswitch?: { tool: 'claude' | 'codex'; apiKey: string; model: string };
   }) => Promise<{ success: boolean; existing?: boolean; error?: string }>;
   terminalInput: (id: string, data: string) => void;
   terminalResize: (id: string, cols: number, rows: number) => void;

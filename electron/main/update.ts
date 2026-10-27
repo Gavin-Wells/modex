@@ -1,3 +1,4 @@
+// Modified for Modex release updates.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,23 +20,14 @@ import type {
   UpdateInfo,
 } from 'electron-updater';
 import { createRequire } from 'node:module';
-import {
-  DEFAULT_CDN_RELEASE_BASE_URL,
-  getGitHubReleaseChannel,
-  getUpdatePlatformDirectory,
-  GitHubReleaseCdnProvider,
-} from './githubReleaseCdnProvider';
 
 const { autoUpdater } = createRequire(import.meta.url)('electron-updater');
 
 export function update(win: Electron.BrowserWindow) {
   // When set to false, the update download will be triggered through the API
-  autoUpdater.verifyUpdateCodeSignature = false;
   autoUpdater.autoDownload = false;
   autoUpdater.disableWebInstaller = false;
   autoUpdater.allowDowngrade = false;
-
-  autoUpdater.forceDevUpdateConfig = true;
 
   // start check
   autoUpdater.on('checking-for-update', function () {});
@@ -62,30 +54,11 @@ export function update(win: Electron.BrowserWindow) {
   console.log('Current version:', autoUpdater.currentVersion.version);
   console.log('Update config path:', autoUpdater.getUpdateConfigPath?.());
   console.log('User data path (where config lives):', app.getPath('userData'));
-  const platformDir = getUpdatePlatformDirectory(
-    process.platform,
-    process.arch
-  );
-
-  if (!platformDir) {
-    console.warn(
-      `[AutoUpdater] Updates are not configured for ${process.platform}/${process.arch}`
-    );
-    return;
-  }
-
-  const cdnBaseUrl =
-    process.env.EIGENT_UPDATER_CDN_BASE_URL || DEFAULT_CDN_RELEASE_BASE_URL;
-  const channel = getGitHubReleaseChannel(process.platform, process.arch);
   const feed = {
-    provider: 'custom' as const,
-    updateProvider: GitHubReleaseCdnProvider,
-    owner: 'eigent-ai',
-    repo: 'eigent',
+    provider: 'github' as const,
+    owner: 'Gavin-Wells',
+    repo: 'modex',
     releaseType: 'release' as const,
-    channel,
-    cdnBaseUrl,
-    platformDir,
   };
 
   autoUpdater.setFeedURL(feed);
