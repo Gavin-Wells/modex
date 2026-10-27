@@ -430,7 +430,7 @@ let cdp_browser_pool: CdpBrowser[] = [];
 let cdpLastAssignedPort = 9223; // tracks the highest port ever assigned, never decreases
 let cdpHealthCheckTimer: ReturnType<typeof setInterval> | null = null;
 
-const CDP_POOL_FILE = path.join(os.homedir(), '.eigent', 'cdp-browsers.json');
+const CDP_POOL_FILE = path.join(os.homedir(), '.modex', 'cdp-browsers.json');
 
 type BackendStartOptions = {
   forceRestart?: boolean;
@@ -747,7 +747,7 @@ profileInitPromise = findAvailablePort(browser_port).then(async (port) => {
   // Create isolated profile for CDP browser only
   const browserProfilesBase = path.join(
     os.homedir(),
-    '.eigent',
+    '.modex',
     'browser_profiles'
   );
   const cdpProfile = path.join(browserProfilesBase, `cdp_profile_${port}`);
@@ -2430,7 +2430,7 @@ function registerIpcHandlers() {
     writeEnvFile(ENV_PATH, lines.join('\n'));
 
     // Also write to global .env file for backend process to read
-    const GLOBAL_ENV_PATH = path.join(os.homedir(), '.eigent', '.env');
+    const GLOBAL_ENV_PATH = path.join(os.homedir(), '.modex', '.env');
     let globalContent = '';
     try {
       globalContent = fs.existsSync(GLOBAL_ENV_PATH)
@@ -2468,7 +2468,7 @@ function registerIpcHandlers() {
     log.info('env-remove success', ENV_PATH);
 
     // Also remove from global .env file
-    const GLOBAL_ENV_PATH = path.join(os.homedir(), '.eigent', '.env');
+    const GLOBAL_ENV_PATH = path.join(os.homedir(), '.modex', '.env');
     try {
       let globalContent = fs.existsSync(GLOBAL_ENV_PATH)
         ? fs.readFileSync(GLOBAL_ENV_PATH, 'utf-8')
@@ -2856,6 +2856,8 @@ const ensureEigentDirectories = () => {
     path.join(eigentBase, 'venvs'),
     path.join(eigentBase, 'runtime'),
     path.join(eigentBase, 'skills'),
+    path.join(os.homedir(), '.modex'),
+    path.join(os.homedir(), '.modex', 'skills'),
   ];
 
   for (const dir of requiredDirs) {
@@ -2869,7 +2871,7 @@ const ensureEigentDirectories = () => {
 };
 
 // ==================== skills (used at startup and by IPC) ====================
-const SKILLS_ROOT = path.join(os.homedir(), '.eigent', 'skills');
+const SKILLS_ROOT = path.join(os.homedir(), '.modex', 'skills');
 const SKILL_FILE = 'SKILL.md';
 const EXAMPLE_SKILL_MARKER = '.eigent-example-skill';
 
@@ -3330,7 +3332,7 @@ async function createWindowInternal() {
   try {
     const browserProfilesBase = path.join(
       os.homedir(),
-      '.eigent',
+      '.modex',
       'browser_profiles'
     );
     const toolControllerProfile = path.join(
@@ -3748,6 +3750,7 @@ const checkAndStartBackend = async (
           },
           {
             ...codexResolverEnv,
+            EIGENT_WORKSPACE: path.join(os.homedir(), '.modex', 'workspace'),
             EIGENT_EXAMPLE_SKILLS_DIR: exampleSkillsDir,
             EIGENT_LOCAL_CONTROL_CAPABILITY: localControlCapability,
             EIGENT_DESKTOP_INSTANCE_ID: resolveDesktopInstanceId(),

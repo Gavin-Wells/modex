@@ -1,3 +1,4 @@
+# Modified for Modex local data paths.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,7 +34,7 @@ class RemoteHands(IHands):
     def __init__(
         self,
         cluster: IHandsCluster | None = None,
-        workspace_root: str = "~/.eigent/workspace",
+        workspace_root: str = "~/.modex/workspace",
     ) -> None:
         self._cluster = cluster
         self.workspace_root = Path(workspace_root).expanduser()

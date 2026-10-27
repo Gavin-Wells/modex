@@ -1,3 +1,4 @@
+// Modified for Modex local data paths.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -877,7 +878,7 @@ export class FileReader {
 
   private findProjectTaskPath(
     userHome: string,
-    rootDir: 'eigent' | '.eigent',
+    rootDir: 'modex' | '.modex',
     identities: string[],
     projectId: string,
     taskId: string
@@ -948,14 +949,14 @@ export class FileReader {
       dirPath =
         this.findProjectTaskPath(
           userHome,
-          'eigent',
+          'modex',
           identities,
           projectId,
           taskId
         ) ||
         path.join(
           userHome,
-          'eigent',
+          'modex',
           safeEmail,
           `project_${projectId}`,
           this.taskDirName(taskId)
@@ -963,14 +964,14 @@ export class FileReader {
       logPath =
         this.findProjectTaskPath(
           userHome,
-          '.eigent',
+          '.modex',
           identities,
           projectId,
           taskId
         ) ||
         path.join(
           userHome,
-          '.eigent',
+          '.modex',
           safeEmail,
           `project_${projectId}`,
           this.taskDirName(taskId)
@@ -978,7 +979,7 @@ export class FileReader {
       return { dirPath, logPath };
     }
 
-    const userDir = path.join(userHome, 'eigent', safeEmail);
+    const userDir = path.join(userHome, 'modex', safeEmail);
     const projectBasedPath = this.findTaskInProjects(userDir, taskId);
 
     if (projectBasedPath) {
@@ -987,7 +988,7 @@ export class FileReader {
       if (projectMatch) {
         logPath = path.join(
           userHome,
-          '.eigent',
+          '.modex',
           safeEmail,
           projectMatch[0],
           this.taskDirName(taskId)
@@ -995,7 +996,7 @@ export class FileReader {
       } else {
         logPath = path.join(
           userHome,
-          '.eigent',
+          '.modex',
           safeEmail,
           this.taskDirName(taskId)
         );
@@ -1005,13 +1006,13 @@ export class FileReader {
 
     dirPath = path.join(
       userHome,
-      'eigent',
+      'modex',
       safeEmail,
       this.taskDirName(taskId)
     );
     logPath = path.join(
       userHome,
-      '.eigent',
+      '.modex',
       safeEmail,
       this.taskDirName(taskId)
     );
@@ -1098,7 +1099,7 @@ export class FileReader {
     userId?: string | number | null
   ): { src: string; destName: string }[] {
     const userHome = app.getPath('home');
-    const eigentRoot = path.join(userHome, '.eigent');
+    const eigentRoot = path.join(userHome, '.modex');
     const toEntry = (dir: string) => ({
       src: dir,
       destName: path.relative(eigentRoot, dir) || path.basename(dir),
@@ -1155,7 +1156,7 @@ export class FileReader {
       .replace(/[\\/*?:"<>|\s]/g, '_')
       .replace(/^\.+|\.+$/g, '');
     const userHome = app.getPath('home');
-    const dirPath = path.join(userHome, 'eigent', safeEmail);
+    const dirPath = path.join(userHome, 'modex', safeEmail);
 
     try {
       if (!fs.existsSync(dirPath)) {
@@ -1199,7 +1200,7 @@ export class FileReader {
       .replace(/[\\/*?:"<>|\s]/g, '_')
       .replace(/^\.+|\.+$/g, '');
     const userHome = app.getPath('home');
-    const userDir = path.join(userHome, 'eigent', safeEmail);
+    const userDir = path.join(userHome, 'modex', safeEmail);
 
     try {
       if (!fs.existsSync(userDir)) {
@@ -1257,7 +1258,7 @@ export class FileReader {
     const userHome = app.getPath('home');
     const projectPath = path.join(
       userHome,
-      'eigent',
+      'modex',
       safeEmail,
       `project_${projectId}`
     );
@@ -1317,29 +1318,29 @@ export class FileReader {
     const sourcePath =
       this.taskDirNameCandidates(taskId)
         .map((taskDirName) =>
-          path.join(userHome, 'eigent', safeEmail, taskDirName)
+          path.join(userHome, 'modex', safeEmail, taskDirName)
         )
         .find((candidate) => fs.existsSync(candidate)) ||
-      path.join(userHome, 'eigent', safeEmail, this.taskDirName(taskId));
+      path.join(userHome, 'modex', safeEmail, this.taskDirName(taskId));
     const sourceLogPath =
       this.taskDirNameCandidates(taskId)
         .map((taskDirName) =>
-          path.join(userHome, '.eigent', safeEmail, taskDirName)
+          path.join(userHome, '.modex', safeEmail, taskDirName)
         )
         .find((candidate) => fs.existsSync(candidate)) ||
-      path.join(userHome, '.eigent', safeEmail, this.taskDirName(taskId));
+      path.join(userHome, '.modex', safeEmail, this.taskDirName(taskId));
 
     // Destination paths (project structure)
     const projectPath = path.join(
       userHome,
-      'eigent',
+      'modex',
       safeEmail,
       `project_${projectId}`
     );
     const destPath = path.join(projectPath, this.taskDirName(taskId));
     const destLogPath = path.join(
       userHome,
-      '.eigent',
+      '.modex',
       safeEmail,
       `project_${projectId}`,
       this.taskDirName(taskId)

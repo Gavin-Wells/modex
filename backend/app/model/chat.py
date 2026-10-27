@@ -1,3 +1,4 @@
+# Modified for Modex local data paths.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -220,14 +221,14 @@ class Chat(BaseModel):
         # Use project-based structure: project_{project_id}/task_{task_id}
         project_base = (
             Path.home()
-            / "eigent"
+            / "modex"
             / owner_key
             / f"project_{self.project_id}"
             / task_dir_name(run_id)
         )
         legacy_project_base = (
             Path.home()
-            / "eigent"
+            / "modex"
             / legacy_owner_key
             / f"project_{self.project_id}"
             / task_dir_name(run_id)

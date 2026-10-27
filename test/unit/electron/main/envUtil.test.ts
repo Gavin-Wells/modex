@@ -51,7 +51,7 @@ describe('envUtil file permissions', () => {
   });
 
   posixIt('restricts an existing user env file to 0600', () => {
-    const eigentDir = path.join(homeDir, '.eigent');
+    const eigentDir = path.join(homeDir, '.modex');
     fs.mkdirSync(eigentDir, { recursive: true });
     const envPath = path.join(eigentDir, '.env.user');
     fs.writeFileSync(envPath, 'API_KEY=secret\n');
@@ -247,7 +247,7 @@ describe('envUtil file permissions', () => {
   });
 
   it('keeps existing-file permission hardening best-effort on load', () => {
-    const eigentDir = path.join(homeDir, '.eigent');
+    const eigentDir = path.join(homeDir, '.modex');
     fs.mkdirSync(eigentDir);
     const envPath = path.join(eigentDir, '.env.user');
     fs.writeFileSync(envPath, 'API_KEY=secret\n');

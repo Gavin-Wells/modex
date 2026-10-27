@@ -1,3 +1,4 @@
+// Modified for Modex local configuration.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -145,7 +146,7 @@ export class WorkspaceSecretVault {
 
   constructor(options: WorkspaceSecretVaultOptions = {}) {
     this.rootDir =
-      options.rootDir ?? path.join(os.homedir(), '.eigent', 'secure');
+      options.rootDir ?? path.join(os.homedir(), '.modex', 'secure');
     this.filePath = path.join(this.rootDir, VAULT_FILE_NAME);
     this.encryption = options.crypto ?? defaultCrypto();
     this.platform = options.platform ?? process.platform;

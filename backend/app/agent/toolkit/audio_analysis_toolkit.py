@@ -1,3 +1,4 @@
+# Modified for Modex local data paths.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +38,7 @@ class AudioAnalysisToolkit(BaseAudioAnalysisToolkit, AbstractToolkit):
     ):
         if cache_dir is None:
             cache_dir = env(
-                "file_save_path", os.path.expanduser("~/.eigent/tmp/")
+                "file_save_path", os.path.expanduser("~/.modex/tmp/")
             )
         super().__init__(
             cache_dir, transcribe_model, audio_reasoning_model, timeout

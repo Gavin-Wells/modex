@@ -1,3 +1,4 @@
+# Modified for Modex local data paths.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -703,7 +704,7 @@ async def uninstall_tool(tool: str):
             token_dirs.add(
                 os.path.join(
                     os.path.expanduser("~"),
-                    ".eigent",
+                    ".modex",
                     "tokens",
                     "google_calendar",
                 )
@@ -915,7 +916,7 @@ async def open_browser_login():
         # On Eigent startup, this data will be copied
         # to WebView partition (one-way sync)
         browser_profiles_base = os.path.expanduser(
-            "~/.eigent/browser_profiles"
+            "~/.modex/browser_profiles"
         )
         user_data_dir = os.path.join(
             browser_profiles_base, "profile_user_login"
@@ -1080,7 +1081,7 @@ async def list_cookie_domains(search: str = None):
     """
     try:
         # Use tool_controller browser's user data directory (source of truth)
-        user_data_base = os.path.expanduser("~/.eigent/browser_profiles")
+        user_data_base = os.path.expanduser("~/.modex/browser_profiles")
         user_data_dir = os.path.join(user_data_base, "profile_user_login")
 
         logger.info(
@@ -1175,7 +1176,7 @@ async def get_domain_cookies(domain: str):
         cookies
     """
     try:
-        user_data_base = os.path.expanduser("~/.eigent/browser_profiles")
+        user_data_base = os.path.expanduser("~/.modex/browser_profiles")
         user_data_dir = os.path.join(user_data_base, "profile_user_login")
 
         if not os.path.exists(user_data_dir):
@@ -1222,7 +1223,7 @@ async def delete_domain_cookies(domain: str):
         deleted cookies
     """
     try:
-        user_data_base = os.path.expanduser("~/.eigent/browser_profiles")
+        user_data_base = os.path.expanduser("~/.modex/browser_profiles")
         user_data_dir = os.path.join(user_data_base, "profile_user_login")
 
         if not os.path.exists(user_data_dir):
@@ -1270,7 +1271,7 @@ async def delete_all_cookies():
         deleted cookies
     """
     try:
-        user_data_base = os.path.expanduser("~/.eigent/browser_profiles")
+        user_data_base = os.path.expanduser("~/.modex/browser_profiles")
         user_data_dir = os.path.join(user_data_base, "profile_user_login")
 
         if not os.path.exists(user_data_dir):

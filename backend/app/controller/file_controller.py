@@ -1,3 +1,4 @@
+# Modified for Modex local data paths.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,22 +53,16 @@ file_logger = logging.getLogger("file_controller")
 # Config
 MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024  # 50MB
 MAX_FILES_PER_SESSION = 20
-WORKSPACE_ROOT = env("EIGENT_WORKSPACE", "~/.eigent/workspace")
+WORKSPACE_ROOT = env("EIGENT_WORKSPACE", "~/.modex/workspace")
 SESSION_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 FILE_LIST_SEMAPHORE = asyncio.Semaphore(4)
 SLOW_FILE_LIST_LOG_MS = 300
 
 
 def _get_eigent_root() -> Path:
-    """Base root for eigent storage (~/eigent). Do NOT use env file_save_path
+    """Base root for Modex storage (~/modex). Do NOT use env file_save_path
     here: chat overwrites it to task path, which would break list/stream."""
-    eigent = Path.home() / "eigent"
-    if eigent.exists():
-        return eigent
-    dot_eigent = Path.home() / ".eigent"
-    if dot_eigent.exists():
-        return dot_eigent
-    return eigent  # default to ~/eigent
+    return Path.home() / "modex"
 
 
 def _get_workspace_root() -> Path:

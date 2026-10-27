@@ -1,3 +1,4 @@
+# Modified for Modex local data paths.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,7 +40,7 @@ class GoogleCalendarToolkit(BaseGoogleCalendarToolkit, AbstractToolkit):
         # Can be overridden by env.
         self._token_path = env("GOOGLE_CALENDAR_TOKEN_PATH") or os.path.join(
             os.path.expanduser("~"),
-            ".eigent",
+            ".modex",
             "tokens",
             "google_calendar",
             "google_calendar_token.json",
@@ -50,7 +51,7 @@ class GoogleCalendarToolkit(BaseGoogleCalendarToolkit, AbstractToolkit):
     def _build_canonical_token_path(cls) -> str:
         return env("GOOGLE_CALENDAR_TOKEN_PATH") or os.path.join(
             os.path.expanduser("~"),
-            ".eigent",
+            ".modex",
             "tokens",
             "google_calendar",
             "google_calendar_token.json",
@@ -297,7 +298,7 @@ class GoogleCalendarToolkit(BaseGoogleCalendarToolkit, AbstractToolkit):
                 # Save credentials to token file
                 token_path = env("GOOGLE_CALENDAR_TOKEN_PATH") or os.path.join(
                     os.path.expanduser("~"),
-                    ".eigent",
+                    ".modex",
                     "tokens",
                     "google_calendar",
                     "google_calendar_token.json",

@@ -1,3 +1,4 @@
+# Modified for Modex local data paths.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +21,7 @@ from app.hands.interface import IHands
 class FullHands(IHands):
     """Full capabilities: terminal, filesystem, browser, MCP all available"""
 
-    def __init__(self, workspace_root: str = "~/.eigent/workspace") -> None:
+    def __init__(self, workspace_root: str = "~/.modex/workspace") -> None:
         self.workspace_root = Path(workspace_root).expanduser()
 
     @property

@@ -1,3 +1,4 @@
+# Modified for Modex local data paths.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -484,7 +485,7 @@ def ensure_cdp_browser_available(port: int = DEFAULT_CDP_PORT) -> bool:
         return False
 
     user_data_dir = os.path.expanduser(
-        f"~/.eigent/browser_profiles/cdp_brain_{port}"
+        f"~/.modex/browser_profiles/cdp_brain_{port}"
     )
     proc = _launch_browser(executable, port, user_data_dir)
     if not proc:

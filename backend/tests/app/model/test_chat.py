@@ -332,7 +332,7 @@ class TestFileSavePath:
 
         assert resolved == (
             tmp_path
-            / "eigent"
+            / "modex"
             / "user_42"
             / "project_project-1"
             / "task_run-1"
@@ -344,7 +344,7 @@ class TestFileSavePath:
     ):
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
         legacy_path = (
-            tmp_path / "eigent" / "alice" / "project_project-1" / "task_run-1"
+            tmp_path / "modex" / "alice" / "project_project-1" / "task_run-1"
         )
         legacy_path.mkdir(parents=True)
 
@@ -357,7 +357,7 @@ class TestFileSavePath:
     ):
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
         legacy_path = (
-            tmp_path / "eigent" / "alice" / "project_project-1" / "task_run-1"
+            tmp_path / "modex" / "alice" / "project_project-1" / "task_run-1"
         )
         legacy_path.mkdir(parents=True)
 
@@ -377,7 +377,7 @@ class TestFileSavePath:
 
         assert resolved == (
             tmp_path
-            / "eigent"
+            / "modex"
             / "user_42"
             / "project_project-1"
             / "task_run-1"

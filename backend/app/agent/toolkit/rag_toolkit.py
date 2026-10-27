@@ -1,3 +1,4 @@
+# Modified for Modex local data paths.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +32,7 @@ from app.service.task import Agents
 logger = logging.getLogger("rag_toolkit")
 
 # Default paths and constants
-DEFAULT_RAG_STORAGE_PATH = "~/.eigent/rag_storage"
+DEFAULT_RAG_STORAGE_PATH = "~/.modex/rag_storage"
 DEFAULT_COLLECTION_NAME = "default"
 RAW_TEXT_SUBDIR = "raw_text"
 DEFAULT_STORAGE_TYPE = StorageType.QDRANT

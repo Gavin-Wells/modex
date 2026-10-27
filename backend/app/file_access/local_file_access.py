@@ -1,3 +1,4 @@
+# Modified for Modex local data paths.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +21,7 @@ from app.file_access.interface import IFileAccess
 class LocalFileAccess(IFileAccess):
     """Direct local filesystem access (Desktop/CLI)"""
 
-    def __init__(self, workspace_root: str = "~/.eigent/workspace") -> None:
+    def __init__(self, workspace_root: str = "~/.modex/workspace") -> None:
         self.workspace_root = Path(workspace_root).expanduser()
 
     def read_file(self, path: str) -> str:

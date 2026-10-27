@@ -1,3 +1,4 @@
+// Modified for Modex local data paths.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -55,7 +56,7 @@ export function resolveProjectStoragePath({
   const fallbackIdentity = identities[0] || sanitizeStorageIdentity(email);
   const fallbackPath = path.join(
     homeDir,
-    'eigent',
+    'modex',
     fallbackIdentity,
     `project_${projectId}`
   );
@@ -63,7 +64,7 @@ export function resolveProjectStoragePath({
   for (const identity of identities) {
     const projectPath = path.join(
       homeDir,
-      'eigent',
+      'modex',
       identity,
       `project_${projectId}`
     );

@@ -1,3 +1,4 @@
+# Modified for Modex local data paths.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -379,7 +380,7 @@ def _trim_in_process_history(task_lock: TaskLock, keep_recent: int = 4) -> int:
     """Compact in-process conversation + agent snapshot history.
 
     Memory feature already persists the full transcript to
-    ``~/.eigent/memory/<...>/conversation.jsonl`` at every Run end; the
+    ``~/.modex/memory/<...>/conversation.jsonl`` at every Run end; the
     in-process ``conversation_history`` and ``agent_memory_history`` lists
     exist only to feed the next workforce turn's prompt. When they grow past
     the 200K-char guard we drop the older entries here and append a marker
@@ -404,7 +405,7 @@ def _trim_in_process_history(task_lock: TaskLock, keep_recent: int = 4) -> int:
         return 0
     marker = (
         f"\n[memory] Compacted {dropped} older in-process turn(s); the full "
-        f"transcript is preserved in ~/.eigent/memory under this Project."
+        f"transcript is preserved in ~/.modex/memory under this Project."
     )
     summary = getattr(task_lock, "memory_summary", "") or ""
     if marker.strip() not in summary:

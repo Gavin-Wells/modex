@@ -1,4 +1,5 @@
 // Modified for Modex local service configuration.
+// Modified for Modex local configuration.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -241,7 +242,7 @@ export async function startBackend(
   }
 
   const uvEnv = getUvEnv(currentVersion);
-  const globalEnvPath = path.join(os.homedir(), '.eigent', '.env');
+  const globalEnvPath = path.join(os.homedir(), '.modex', '.env');
 
   // Load proxy configuration from global .env file
   const proxyUrl = readGlobalEnvKey('HTTP_PROXY');

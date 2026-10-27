@@ -1,3 +1,4 @@
+// Modified for Modex local configuration.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +17,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
-const MCP_CONFIG_DIR = path.join(os.homedir(), '.eigent');
+const MCP_CONFIG_DIR = path.join(os.homedir(), '.modex');
 const MCP_CONFIG_PATH = path.join(MCP_CONFIG_DIR, 'mcp.json');
 
 type McpServerConfig =

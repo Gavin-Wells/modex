@@ -1,3 +1,4 @@
+# Modified for Modex local data paths.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,17 +20,11 @@ from app.component.environment import env
 
 
 def get_workspace_root() -> Path:
-    return Path(env("EIGENT_WORKSPACE", "~/.eigent/workspace")).expanduser()
+    return Path(env("EIGENT_WORKSPACE", "~/.modex/workspace")).expanduser()
 
 
 def get_eigent_root() -> Path:
-    eigent = Path.home() / "eigent"
-    if eigent.exists():
-        return eigent
-    dot_eigent = Path.home() / ".eigent"
-    if dot_eigent.exists():
-        return dot_eigent
-    return eigent
+    return Path.home() / "modex"
 
 
 def sanitize_email(email: str) -> str:
@@ -90,7 +85,7 @@ def camel_log_root(
 ) -> Path:
     return (
         Path.home()
-        / ".eigent"
+        / ".modex"
         / runtime_owner_key(email, user_id)
         / f"project_{project_id}"
         / task_dir_name(task_id)
@@ -103,7 +98,7 @@ def legacy_camel_log_root(
 ) -> Path:
     return (
         Path.home()
-        / ".eigent"
+        / ".modex"
         / runtime_owner_key(email, user_id)
         / task_dir_name(task_id)
         / "camel_logs"
@@ -118,7 +113,7 @@ def runtime_task_root(
 ) -> Path:
     return (
         Path.home()
-        / ".eigent"
+        / ".modex"
         / runtime_owner_key(email, user_id)
         / "runtime"
         / f"project_{project_id}"
@@ -135,7 +130,7 @@ def run_output_root(
 ) -> Path:
     return (
         Path.home()
-        / ".eigent"
+        / ".modex"
         / runtime_owner_key(email, user_id)
         / "spaces"
         / space_id
@@ -154,7 +149,7 @@ def project_workdir_root(
 ) -> Path:
     return (
         Path.home()
-        / ".eigent"
+        / ".modex"
         / runtime_owner_key(email, user_id)
         / "spaces"
         / space_id
@@ -167,7 +162,7 @@ def project_workdir_root(
 def workspace_state_root(email: str, user_id: str | int | None = None) -> Path:
     return (
         Path.home()
-        / ".eigent"
+        / ".modex"
         / "workspaces"
         / runtime_owner_key(email, user_id)
     )

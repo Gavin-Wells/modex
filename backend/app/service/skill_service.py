@@ -1,3 +1,4 @@
+# Modified for Modex local configuration.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +22,7 @@ import tempfile
 import zipfile
 from pathlib import Path
 
-SKILLS_ROOT = Path.home() / ".eigent" / "skills"
+SKILLS_ROOT = Path.home() / ".modex" / "skills"
 SKILL_FILE = "SKILL.md"
 EXAMPLE_SKILLS_ENV = "EIGENT_EXAMPLE_SKILLS_DIR"
 EXAMPLE_SKILL_MARKER = ".eigent-example-skill"

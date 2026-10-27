@@ -379,7 +379,7 @@ describe('File Operations and Utilities', () => {
       it('should create project directory structure', () => {
         const _email = 'test@example.com';
         const projectId = 'xyz123';
-        const expectedPath = '/home/test/eigent/test/project_xyz123';
+        const expectedPath = '/home/test/modex/test/project_xyz123';
 
         (fs.existsSync as Mock).mockReturnValue(false);
         (fs.mkdirSync as Mock).mockImplementation(() => {});
@@ -392,7 +392,7 @@ describe('File Operations and Utilities', () => {
         const result = mockPath.join(
           '/home',
           'test',
-          'eigent',
+          'modex',
           'test',
           `project_${projectId}`
         );
@@ -461,7 +461,7 @@ describe('File Operations and Utilities', () => {
 
         if (!hasProjectStructure) {
           // Should look in legacy location
-          const legacyPath = `/home/user/eigent/user/task_${taskId}`;
+          const legacyPath = `/home/user/modex/user/task_${taskId}`;
           expect(legacyPath).toContain('task_legacy-task-123');
         }
       });
@@ -470,9 +470,9 @@ describe('File Operations and Utilities', () => {
         const taskId = 'task123';
         const projectId = 'xyz';
 
-        const projectBasedPath = `/home/user/eigent/user/project_${projectId}/task_${taskId}`;
+        const projectBasedPath = `/home/user/modex/user/project_${projectId}/task_${taskId}`;
         expect(projectBasedPath).toBe(
-          '/home/user/eigent/user/project_xyz/task_task123'
+          '/home/user/modex/user/project_xyz/task_task123'
         );
       });
     });
@@ -482,8 +482,8 @@ describe('File Operations and Utilities', () => {
         const taskId = '1760964010356-4844';
         const projectId = 'xyz';
 
-        const sourcePath = `/home/user/eigent/user/task_${taskId}`;
-        const destPath = `/home/user/eigent/user/project_${projectId}/task_${taskId}`;
+        const sourcePath = `/home/user/modex/user/task_${taskId}`;
+        const destPath = `/home/user/modex/user/project_${projectId}/task_${taskId}`;
 
         (fs.existsSync as Mock).mockImplementation((path: string) => {
           return path === sourcePath;
@@ -496,7 +496,7 @@ describe('File Operations and Utilities', () => {
 
         // Simulate move operation
         if (fs.existsSync(sourcePath)) {
-          const projectDir = `/home/user/eigent/user/project_${projectId}`;
+          const projectDir = `/home/user/modex/user/project_${projectId}`;
           if (!fs.existsSync(projectDir)) {
             mockMkdirSync(projectDir, { recursive: true });
           }
@@ -504,7 +504,7 @@ describe('File Operations and Utilities', () => {
         }
 
         expect(mockMkdirSync).toHaveBeenCalledWith(
-          `/home/user/eigent/user/project_${projectId}`,
+          `/home/user/modex/user/project_${projectId}`,
           { recursive: true }
         );
         expect(mockRenameSync).toHaveBeenCalledWith(sourcePath, destPath);
@@ -514,8 +514,8 @@ describe('File Operations and Utilities', () => {
         const taskId = 'test123';
         const projectId = 'xyz';
 
-        const sourceLogPath = `/home/.eigent/user/task_${taskId}`;
-        const destLogPath = `/home/.eigent/user/project_${projectId}/task_${taskId}`;
+        const sourceLogPath = `/home/.modex/user/task_${taskId}`;
+        const destLogPath = `/home/.modex/user/project_${projectId}/task_${taskId}`;
 
         (fs.existsSync as Mock).mockReturnValue(true);
         const mockRenameSync = vi.fn();
@@ -524,7 +524,7 @@ describe('File Operations and Utilities', () => {
         vi.mocked(fs).mkdirSync = mockMkdirSync;
 
         // Simulate log migration
-        const destLogDir = `/home/.eigent/user/project_${projectId}`;
+        const destLogDir = `/home/.modex/user/project_${projectId}`;
         mockMkdirSync(destLogDir, { recursive: true });
         mockRenameSync(sourceLogPath, destLogPath);
 
@@ -543,7 +543,7 @@ describe('File Operations and Utilities', () => {
         vi.mocked(fs).renameSync = mockRenameSync;
 
         // Should not attempt to move non-existent files
-        const sourcePath = `/home/user/eigent/user/task_${taskId}`;
+        const sourcePath = `/home/user/modex/user/task_${taskId}`;
         if (fs.existsSync(sourcePath)) {
           fs.renameSync(sourcePath, '/dest/path');
         }
@@ -558,14 +558,14 @@ describe('File Operations and Utilities', () => {
           {
             id: 'xyz',
             name: 'Project xyz',
-            path: '/home/eigent/user/project_xyz',
+            path: '/home/modex/user/project_xyz',
             taskCount: 5,
             createdAt: new Date('2025-10-20'),
           },
           {
             id: 'abc',
             name: 'Project abc',
-            path: '/home/eigent/user/project_abc',
+            path: '/home/modex/user/project_abc',
             taskCount: 3,
             createdAt: new Date('2025-10-19'),
           },
@@ -645,10 +645,10 @@ describe('File Operations and Utilities', () => {
         const _email = 'test@example.com';
         const taskId = 'existing123';
 
-        const legacyPath = `/home/eigent/test/task_${taskId}`;
+        const legacyPath = `/home/modex/test/task_${taskId}`;
 
         // Should still be able to access legacy paths
-        expect(legacyPath).toBe('/home/eigent/test/task_existing123');
+        expect(legacyPath).toBe('/home/modex/test/task_existing123');
       });
 
       it('should handle mixed legacy and project-based structures', () => {

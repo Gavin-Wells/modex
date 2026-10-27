@@ -1,3 +1,4 @@
+// Modified for Modex local data paths.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -67,7 +68,7 @@ function boundWorkspaceRoots(home: string, identities: string[]): string[] {
   for (const identity of identities) {
     const bindings = path.join(
       home,
-      '.eigent',
+      '.modex',
       'workspaces',
       identity,
       'spaces'
@@ -150,7 +151,7 @@ export function deleteOwnedTaskFiles({
     const targets = new Set<string>();
     const containers = new Set<string>();
     for (const identity of new Set(identities)) {
-      for (const root of ['eigent', '.eigent']) {
+      for (const root of ['modex', '.modex']) {
         const ownerRoot = path.join(home, root, identity);
         for (const taskName of taskNames) {
           // Legacy pre-Project paths are task-scoped, never owner-scoped.
@@ -165,7 +166,7 @@ export function deleteOwnedTaskFiles({
       if (projectId && spaceId) {
         const projectRoot = path.join(
           home,
-          '.eigent',
+          '.modex',
           identity,
           'spaces',
           spaceId,

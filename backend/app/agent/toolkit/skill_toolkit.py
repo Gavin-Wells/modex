@@ -1,3 +1,4 @@
+# Modified for Modex local configuration.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,10 +58,10 @@ def _get_user_config_path(user_id: str | None = None) -> Path:
     if user_id:
         # User-specific config: ~/.eigent/user_<id>/skills-config.json
         user_key = canonical_skill_config_user_id(user_id)
-        return Path.home() / ".eigent" / user_key / SKILL_CONFIG_FILENAME
+        return Path.home() / ".modex" / user_key / SKILL_CONFIG_FILENAME
     else:
         # Legacy global config: ~/.eigent/skills-config.json
-        return Path.home() / ".eigent" / SKILL_CONFIG_FILENAME
+        return Path.home() / ".modex" / SKILL_CONFIG_FILENAME
 
 
 def _load_skill_config(config_path: Path) -> dict[str, SkillEntryConfig]:
@@ -394,7 +395,7 @@ class SkillToolkit(BaseSkillToolkit):
         roots.append(("repo", self.working_directory / ".agents" / "skills"))
 
         # 2. User scope - user-level skills
-        roots.append(("user", Path.home() / ".eigent" / "skills"))
+        roots.append(("user", Path.home() / ".modex" / "skills"))
         roots.append(("user", Path.home() / ".camel" / "skills"))
         roots.append(("user", Path.home() / ".config" / "camel" / "skills"))
 

@@ -1,3 +1,4 @@
+# Modified for Modex local data paths.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -783,7 +784,7 @@ class HybridBrowserToolkit(BaseHybridBrowserToolkit, AbstractToolkit):
         if user_data_dir is None:
             # Use browser port to determine profile directory
             browser_port = env("browser_port", "9222")
-            user_data_base = os.path.expanduser("~/.eigent/browser_profiles")
+            user_data_base = os.path.expanduser("~/.modex/browser_profiles")
             user_data_dir = os.path.join(
                 user_data_base, f"profile_{browser_port}"
             )

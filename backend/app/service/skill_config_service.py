@@ -1,3 +1,4 @@
+# Modified for Modex local configuration.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +13,7 @@
 # limitations under the License.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
-"""Skills config: ~/.eigent/user_<id>/skills-config.json."""
+"""Skills config: ~/.modex/user_<id>/skills-config.json."""
 
 import json
 import logging
@@ -28,7 +29,7 @@ from app.service.skill_service import (
 
 logger = logging.getLogger("skill_config")
 
-EIGENT_ROOT = Path.home() / ".eigent"
+EIGENT_ROOT = Path.home() / ".modex"
 SKILL_CONFIG_FILENAME = "skills-config.json"
 
 

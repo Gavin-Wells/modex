@@ -1,3 +1,4 @@
+// Modified for Modex local configuration.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -74,9 +75,9 @@ export function getEnvPath(email: string) {
     .split('@')[0]
     .replace(/[\\/*?:"<>|\s]/g, '_')
     .replace('.', '_');
-  const eigentDir = path.join(os.homedir(), '.eigent');
+  const eigentDir = path.join(os.homedir(), '.modex');
 
-  // Ensure .eigent directory exists
+  // Ensure .modex directory exists
   if (!fs.existsSync(eigentDir)) {
     fs.mkdirSync(eigentDir, { recursive: true });
   }
@@ -141,11 +142,11 @@ export function removeEnvKey(lines: string[], key: string) {
 }
 
 /**
- * Read the value of a key from the global ~/.eigent/.env file.
+ * Read the value of a key from the global ~/.modex/.env file.
  */
 export function readGlobalEnvKey(key: string): string | null {
   try {
-    const globalEnvPath = path.join(os.homedir(), '.eigent', '.env');
+    const globalEnvPath = path.join(os.homedir(), '.modex', '.env');
     if (!fs.existsSync(globalEnvPath)) return null;
     const content = fs.readFileSync(globalEnvPath, 'utf-8');
     const prefix = key + '=';
@@ -191,7 +192,7 @@ export function getEmailFolderPath(email: string) {
     .split('@')[0]
     .replace(/[\\/*?:"<>|\s]/g, '_')
     .replace('.', '_');
-  const MCP_CONFIG_DIR = path.join(os.homedir(), '.eigent');
+  const MCP_CONFIG_DIR = path.join(os.homedir(), '.modex');
   const MCP_REMOTE_CONFIG_DIR = path.join(MCP_CONFIG_DIR, tempEmail);
   if (!fs.existsSync(MCP_REMOTE_CONFIG_DIR)) {
     fs.mkdirSync(MCP_REMOTE_CONFIG_DIR, { recursive: true });

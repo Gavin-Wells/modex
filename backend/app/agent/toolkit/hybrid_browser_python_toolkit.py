@@ -1,3 +1,4 @@
+# Modified for Modex local data paths.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -170,7 +171,7 @@ class HybridBrowserPythonToolkit(BaseHybridBrowserToolkit, AbstractToolkit):
         headless: bool = False,
         user_data_dir: str | None = None,
         stealth: bool = False,
-        cache_dir: str = os.path.expanduser("~/.eigent/tmp/"),
+        cache_dir: str = os.path.expanduser("~/.modex/tmp/"),
         enabled_tools: list[str] | None = None,
         browser_log_to_file: bool = False,
         session_id: str | None = None,

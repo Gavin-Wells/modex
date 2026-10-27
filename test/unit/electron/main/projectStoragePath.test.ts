@@ -24,13 +24,13 @@ describe('projectStoragePath', () => {
     const homeDir = '/Users/test';
     const userProjectPath = path.join(
       homeDir,
-      'eigent',
+      'modex',
       'user_42',
       'project_p1'
     );
     const legacyProjectPath = path.join(
       homeDir,
-      'eigent',
+      'modex',
       'alice',
       'project_p1'
     );
@@ -57,7 +57,7 @@ describe('projectStoragePath', () => {
     const homeDir = '/Users/test';
     const legacyProjectPath = path.join(
       homeDir,
-      'eigent',
+      'modex',
       'alice',
       'project_p1'
     );

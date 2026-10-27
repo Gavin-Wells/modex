@@ -1,3 +1,4 @@
+# Modified for Modex local configuration.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +19,7 @@ from pathlib import Path
 
 logger = logging.getLogger("mcp_config")
 
-MCP_CONFIG_DIR = Path.home() / ".eigent"
+MCP_CONFIG_DIR = Path.home() / ".modex"
 MCP_CONFIG_PATH = MCP_CONFIG_DIR / "mcp.json"
 
 
@@ -54,7 +55,7 @@ def get_mcp_config_path() -> Path:
 
 
 def read_mcp_config() -> dict:
-    """Read MCP config from ~/.eigent/mcp.json."""
+    """Read MCP config from ~/.modex/mcp.json."""
     if not MCP_CONFIG_PATH.exists():
         default = {"mcpServers": {}}
         write_mcp_config(default)
@@ -74,7 +75,7 @@ def read_mcp_config() -> dict:
 
 
 def write_mcp_config(config: dict) -> None:
-    """Write MCP config to ~/.eigent/mcp.json."""
+    """Write MCP config to ~/.modex/mcp.json."""
     MCP_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     MCP_CONFIG_PATH.write_text(
         json.dumps(config, indent=2, ensure_ascii=False),

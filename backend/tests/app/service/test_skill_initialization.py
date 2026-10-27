@@ -193,10 +193,10 @@ def test_agent_skill_toolkit_reads_canonical_user_config_path(
     monkeypatch.setattr(agent_skill_toolkit.Path, "home", lambda: tmp_path)
 
     assert agent_skill_toolkit._get_user_config_path("42") == (
-        tmp_path / ".eigent" / "user_42" / "skills-config.json"
+        tmp_path / ".modex" / "user_42" / "skills-config.json"
     )
     assert agent_skill_toolkit._get_user_config_path("user_42") == (
-        tmp_path / ".eigent" / "user_42" / "skills-config.json"
+        tmp_path / ".modex" / "user_42" / "skills-config.json"
     )
 
 

@@ -1,3 +1,4 @@
+# Modified for Modex local data paths.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 
@@ -255,7 +256,7 @@ def migrate_legacy_workspace_bundle_on_startup(
     *,
     eigent_root: Path | None = None,
 ) -> LegacyMigrationResult:
-    root = eigent_root or Path.home() / ".eigent"
+    root = eigent_root or Path.home() / ".modex"
     return LegacyWorkspaceBundleMigration(
         eigent_root=root,
         journal=journal,

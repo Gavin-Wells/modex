@@ -1,3 +1,4 @@
+# Modified for Modex control-plane protection.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -80,6 +81,11 @@ _CONTROL_PLANE_FILENAMES = frozenset(
         "run-journal.sqlite3-journal",
         "run-journal.sqlite3-shm",
         "run-journal.sqlite3-wal",
+        "workspace-secret",
+        "workspace.sqlite3",
+        "workspace.sqlite3-journal",
+        "workspace.sqlite3-shm",
+        "workspace.sqlite3-wal",
     }
 )
 _GIT_EXECUTION_COMMAND_MARKERS = (
@@ -594,7 +600,8 @@ def _is_control_plane_sequence(words: tuple[str, ...]) -> bool:
     in_eigent_directory = False
     for segment in expanded_segments:
         segment_mentions_eigent = any(
-            ".eigent" in word.lower().replace(chr(92), "/") for word in segment
+            any(root in word.lower().replace(chr(92), "/") for root in (".eigent", ".modex"))
+            for word in segment
         )
         executable = (
             segment[0].lstrip("(").replace(chr(92), "/").rsplit("/", 1)[-1]
@@ -606,9 +613,12 @@ def _is_control_plane_sequence(words: tuple[str, ...]) -> bool:
         for word in segment:
             raw = word.lower().replace(chr(92), "/")
             compact = re.sub(r"[^a-z0-9_]+", "", raw)
-            if "eigentlocalcontrolcapability" in compact:
+            secret_name = compact.replace("_", "")
+            if "eigentlocalcontrolcapability" in secret_name or "modexworkspacecapability" in secret_name:
                 return True
-            if ".eigent" not in raw and not in_eigent_directory:
+            if "workspacesecret" in secret_name or "workspacesqlite3" in secret_name:
+                return True
+            if not any(root in raw for root in (".eigent", ".modex")) and not in_eigent_directory:
                 continue
             if re.search(r"run.*journal.*sqlite", compact) or re.search(
                 r"policy.*sqlite", compact
@@ -811,9 +821,7 @@ def _risk_tags(
                 and lowered_parts[eigent_index + 1] == "skills"
             ):
                 tags.add("untrusted_script")
-        if ".eigent" in parts and candidate.name.lower() in (
-            _CONTROL_PLANE_FILENAMES
-        ):
+        if candidate.name.lower() in _CONTROL_PLANE_FILENAMES:
             tags.add("policy_control_plane")
     command_text = (
         "\n".join(_command_texts(arguments)).lower()

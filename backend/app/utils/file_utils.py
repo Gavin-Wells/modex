@@ -1,3 +1,4 @@
+# Modified for Modex local configuration.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -425,10 +426,10 @@ def get_working_directory(options: Chat, task_lock=None) -> str:
 
 def sync_eigent_skills_to_project(working_directory: str) -> None:
     """
-    Copy skills from ~/.eigent/skills into the project's .eigent/skills
+    Copy skills from ~/.modex/skills into the project's .eigent/skills
     so the agent can load and execute them from the project working directory.
     """
-    src = Path.home() / ".eigent" / "skills"
+    src = Path.home() / ".modex" / "skills"
     dst = Path(working_directory) / ".eigent" / "skills"
     if not src.is_dir():
         return
@@ -449,7 +450,7 @@ def sync_eigent_skills_to_project(working_directory: str) -> None:
         )
     except OSError as e:
         logger.warning(
-            "Failed to sync ~/.eigent/skills to project %s: %s",
+            "Failed to sync ~/.modex/skills to project %s: %s",
             working_directory,
             e,
             exc_info=True,

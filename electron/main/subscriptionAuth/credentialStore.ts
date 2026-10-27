@@ -1,3 +1,4 @@
+// Modified for Modex local configuration.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,7 +61,7 @@ function tempEmail(email: string): string {
 }
 
 export function getCodexAuthDir(email: string): string {
-  return path.join(os.homedir(), '.eigent', tempEmail(email));
+  return path.join(os.homedir(), '.modex', tempEmail(email));
 }
 
 export function getCodexAuthFilePath(email: string): string {

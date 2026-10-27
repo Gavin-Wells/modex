@@ -1,3 +1,4 @@
+# Modified for Modex local data and capability protection.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -162,6 +163,7 @@ def is_control_plane_environment_key(name: str) -> bool:
     normalized = name.strip().upper()
     return (
         normalized == "EIGENT_LOCAL_CONTROL_CAPABILITY"
+        or normalized == "MODEX_WORKSPACE_CAPABILITY"
         or is_secret_broker_environment_key(normalized)
         or normalized == "AUTHORIZATION"
         or normalized.endswith("_AUTHORIZATION")
@@ -281,7 +283,7 @@ class TerminalToolkit(BaseTerminalToolkit, AbstractToolkit):
 
         # Get base directory from environment
         base_dir = env(
-            "file_save_path", os.path.expanduser("~/.eigent/terminal/")
+            "file_save_path", os.path.expanduser("~/.modex/terminal/")
         )
 
         if working_directory is None:
@@ -300,7 +302,7 @@ class TerminalToolkit(BaseTerminalToolkit, AbstractToolkit):
             # owns, or delete another agent's live output log.
             session_logs_dir = str(
                 Path.home()
-                / ".eigent"
+                / ".modex"
                 / "terminal"
                 / "session-logs"
                 / uuid.uuid4().hex
