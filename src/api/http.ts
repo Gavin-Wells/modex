@@ -13,6 +13,7 @@
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import { resolveEventStreamFetch } from '@/api/brainStreamRelay';
+import { resolveProxyBaseUrl } from '@/api/proxyBaseUrl';
 import { showStorageToast } from '@/components/Toast/storageToast';
 import { createHost } from '@/host/createHost';
 import { getAccountEnvironmentKey } from '@/lib/authEnvironment';
@@ -556,24 +557,24 @@ export async function sseTransport(
 
 // get proxy base URL
 export async function getProxyBaseURL() {
-  const isDev = import.meta.env.DEV;
-
-  if (isDev) {
-    // Use empty base so request goes to same origin; Vite proxy forwards /api to VITE_PROXY_URL
-    // This avoids CORS when running dev:web (browser at 5173, server at 3001)
-    return '';
-  } else {
-    const useLocalProxy = import.meta.env.VITE_USE_LOCAL_PROXY === 'true';
-    const proxyUrl = import.meta.env.VITE_PROXY_URL;
-    const baseUrl =
-      !useLocalProxy && proxyUrl
-        ? proxyUrl
-        : import.meta.env.VITE_BASE_URL || proxyUrl;
-    if (!baseUrl) {
-      throw new Error('VITE_BASE_URL or VITE_PROXY_URL not configured');
+  let managedLocalUrl: string | undefined;
+  if (!import.meta.env.DEV && import.meta.env.VITE_USE_LOCAL_PROXY === 'true') {
+    const ipc = createHost().ipcRenderer;
+    if (ipc) {
+      try {
+        managedLocalUrl = await ipc.invoke('workspace-service:get-endpoint');
+      } catch {
+        // Never send account credentials to an unmanaged service on a fixed port.
+      }
     }
-    return String(baseUrl).replace(/\/$/, '');
   }
+  return resolveProxyBaseUrl({
+    development: import.meta.env.DEV,
+    local: import.meta.env.VITE_USE_LOCAL_PROXY === 'true',
+    proxyUrl: import.meta.env.VITE_PROXY_URL,
+    baseUrl: import.meta.env.VITE_BASE_URL,
+    managedLocalUrl,
+  });
 }
 
 async function proxyFetchRequest(

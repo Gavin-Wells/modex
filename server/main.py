@@ -113,7 +113,7 @@ api.add_middleware(TraceIDMiddleware)
 LOG_FORMAT = "{time:YYYY-MM-DD HH:mm:ss} | {level} | {extra[trace_id]} | {message}"
 loguru_logger.configure(extra={"trace_id": "-"})
 loguru_logger.remove()
-loguru_logger.add(sys.stderr, level="DEBUG", filter=trace_filter, format=LOG_FORMAT)
+loguru_logger.add(sys.stderr, level="DEBUG", filter=trace_filter, format=LOG_FORMAT, diagnose=False, backtrace=False)
 loguru_logger.add(
     "runtime/log/app.log",
     rotation="10 MB",
@@ -122,6 +122,8 @@ loguru_logger.add(
     enqueue=True,
     filter=trace_filter,
     format=LOG_FORMAT,
+    diagnose=False,
+    backtrace=False,
 )
 
 # Intercept stdlib logging and redirect to loguru

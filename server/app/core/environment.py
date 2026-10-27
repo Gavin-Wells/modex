@@ -13,7 +13,6 @@
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
 import importlib
-import importlib.util
 import logging
 import os
 from pathlib import Path
@@ -114,17 +113,12 @@ def auto_include_routers(api: FastAPI, prefix: str, directory: str):
 
                 logger.debug("Processing controller file", extra={"file_name": file_name, "file_path": str(file_path)})
 
-                # 生成模块名称
-                module_name = file_path.stem
+                # Import by package name so relative imports and Pydantic's
+                # module lookup use the same registered module object.
+                module_name = ".".join(file_path.relative_to(base_path()).with_suffix("").parts)
 
                 try:
-                    # 使用importlib加载模块
-                    spec = importlib.util.spec_from_file_location(module_name, file_path)
-                    if spec is None or spec.loader is None:
-                        logger.warning("Failed to create module spec", extra={"file_path": str(file_path)})
-                        continue
-                    module = importlib.util.module_from_spec(spec)
-                    spec.loader.exec_module(module)
+                    module = importlib.import_module(module_name)
 
                     # 检查模块中是否存在router属性且是APIRouter实例
                     router = getattr(module, "router", None)
@@ -143,6 +137,7 @@ def auto_include_routers(api: FastAPI, prefix: str, directory: str):
                         extra={"module_name": module_name, "file_path": str(file_path), "error": str(e)},
                         exc_info=True,
                     )
+                    raise RuntimeError(f"Failed to load controller {module_name}") from e
 
     logger.info(
         "Automatic router registration completed",
