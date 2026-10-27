@@ -74,14 +74,6 @@ export function capitalizeFirstLetter(input: string): string {
   return input.charAt(0).toUpperCase() + input.slice(1);
 }
 
-export function hasStackKeys() {
-  return (
-    import.meta.env.VITE_STACK_PROJECT_ID &&
-    import.meta.env.VITE_STACK_PUBLISHABLE_CLIENT_KEY &&
-    import.meta.env.VITE_STACK_SECRET_SERVER_KEY
-  );
-}
-
 // Re-export replay utilities
 export { buildTaskQuestionsById } from './historyPrompts';
 export {

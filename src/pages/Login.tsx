@@ -1,41 +1,75 @@
-// Modified for Modex branding.
-// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
-
+// Modified for Modex authentication.
+// Copyright 2025-2026 @ Eigent.ai. Licensed under the Apache License, Version 2.0.
+import { proxyFetchGet, proxyFetchPost } from '@/api/http';
 import { Button } from '@/components/ui/button';
-import { recordSignInFailed } from '@/lib/events/appEvents';
 import { useAuthStore } from '@/store/authStore';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { proxyFetchGet, proxyFetchPost } from '@/api/http';
-import WindowControls from '@/components/WindowControls';
-import { useHost } from '@/host';
-import {
-  DESKTOP_LOGIN_CALLBACK_URL,
-  getExternalLoginUrl,
-  getWebLoginCallbackUrl,
-} from '@/pages/loginUtils';
-import { useTranslation } from 'react-i18next';
+type SecurityConfig = {
+  turnstile_required: boolean;
+  turnstile_site_key: string;
+};
+type TurnstileApi = {
+  render: (container: HTMLElement, options: Record<string, unknown>) => string;
+  remove: (id: string) => void;
+};
 
-import background from '@/assets/custom/background.png';
-
-const IS_LOCAL_MODE = import.meta.env.VITE_USE_LOCAL_PROXY === 'true';
-let lock = false;
+function Turnstile({
+  siteKey,
+  onToken,
+  onError,
+}: {
+  siteKey: string;
+  onToken: (token: string) => void;
+  onError: (message: string) => void;
+}) {
+  const container = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    let cancelled = false;
+    let widget: string | undefined;
+    const getApi = () =>
+      (window as Window & { turnstile?: TurnstileApi }).turnstile;
+    const mount = () => {
+      if (cancelled || !container.current) return;
+      const api = getApi();
+      if (!api) {
+        onError('人机验证加载失败，请检查网络。');
+        return;
+      }
+      widget = api.render(container.current, {
+        sitekey: siteKey,
+        callback: onToken,
+        'expired-callback': () => onToken(''),
+        'error-callback': () => {
+          onToken('');
+          onError('人机验证失败，请重试。');
+        },
+      });
+    };
+    if (getApi()) mount();
+    else {
+      const script = document.createElement('script');
+      script.src =
+        'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      script.async = true;
+      script.onload = mount;
+      script.onerror = () => {
+        if (!cancelled) onError('人机验证加载失败，请检查网络。');
+      };
+      document.head.appendChild(script);
+    }
+    return () => {
+      cancelled = true;
+      if (widget) getApi()?.remove(widget);
+    };
+  }, [siteKey, onToken, onError]);
+  return <div ref={container} />;
+}
 
 export default function Login() {
-  const host = useHost();
+  const navigate = useNavigate();
+  const location = useLocation();
   const {
     setAuth,
     setModelType,
@@ -43,418 +77,125 @@ export default function Login() {
     setInitState,
     setIsFirstLaunch,
   } = useAuthStore();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { t } = useTranslation();
-  const [isLoading, setIsLoading] = useState(false);
-  const [generalError, setGeneralError] = useState('');
-  const [callbackUrl, setCallbackUrl] = useState<string | null>(null);
-  const titlebarRef = useRef<HTMLDivElement>(null);
-  const handledWebTokenRef = useRef<string | null>(null);
-  const isDesktopHost = !!host?.ipcRenderer && !!host?.electronAPI;
-  const redirectTo =
-    new URLSearchParams(location.search).get('redirect') || '/';
-
-  const getLoginErrorMessage = useCallback(
-    (data: any) => {
-      if (!data || typeof data !== 'object' || typeof data.code !== 'number') {
-        return '';
-      }
-
-      if (data.code === 0) {
-        return '';
-      }
-
-      if (data.code === 10) {
-        return (
-          data.text ||
-          t('layout.login-failed-please-check-your-email-and-password')
-        );
-      }
-
-      if (
-        data.code === 1 &&
-        Array.isArray(data.error) &&
-        data.error.length > 0
-      ) {
-        const firstError = data.error[0];
-        if (typeof firstError === 'string') {
-          return firstError;
-        }
-        if (typeof firstError?.msg === 'string') {
-          return firstError.msg;
-        }
-        if (typeof firstError?.message === 'string') {
-          return firstError.message;
-        }
-      }
-
-      return data.text || t('layout.login-failed-please-try-again');
-    },
-    [t]
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [challenge, setChallenge] = useState('');
+  const [config, setConfig] = useState<SecurityConfig | null>(null);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [challengeVersion, setChallengeVersion] = useState(0);
+  const onChallengeError = useCallback(
+    (message: string) => setError(message),
+    []
   );
 
-  // Auto login for local mode - calls /api/v1/user/auto-login
-  const handleAutoLogin = async () => {
-    setGeneralError('');
-    setIsLoading(true);
+  useEffect(() => {
+    let active = true;
+    proxyFetchGet('/api/v1/user/modelswitch-security-config')
+      .then((data) => {
+        if (active) setConfig(data);
+      })
+      .catch(() => {
+        if (active) setError('无法连接账号服务或本地工作台，请稍后重试。');
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    if (!config || (config.turnstile_required && !challenge)) {
+      setError('请先完成人机验证。');
+      return;
+    }
+    setLoading(true);
+    setError('');
     try {
-      const data = await proxyFetchPost('/api/v1/user/auto-login', {});
-
-      const errorMessage = getLoginErrorMessage(data);
-      if (errorMessage) {
-        setGeneralError(errorMessage);
-        return;
-      }
-
+      const data = await proxyFetchPost(
+        '/api/v1/user/modelswitch-password-login',
+        {
+          username,
+          password,
+          turnstile_token: challenge,
+        }
+      );
+      if (!data?.token || !data?.email)
+        throw new Error('invalid login response');
       setAuth({ email: data.email, ...data });
       setLocalProxyValue(import.meta.env.VITE_USE_LOCAL_PROXY || null);
       setModelType('custom');
       setInitState('done');
       setIsFirstLaunch(false);
-      navigate(redirectTo, { replace: true });
-    } catch (error: any) {
-      console.error('Auto login failed:', error);
-      recordSignInFailed({ reason: 'auto_login_error', method: 'auto' });
-      setGeneralError(t('layout.login-failed-please-try-again'));
+      setPassword('');
+      const redirect =
+        new URLSearchParams(location.search).get('redirect') || '/';
+      navigate(
+        redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/',
+        { replace: true }
+      );
+    } catch {
+      setError('登录失败，请检查账号、密码及人机验证，或稍后重试。');
+      setChallenge('');
+      setChallengeVersion((value) => value + 1);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  };
-
-  // Hybrid/app mode: handle Stack Auth callback (reuse existing OAuth flow)
-  const handleLoginByStack = useCallback(
-    async (token: string) => {
-      try {
-        const data = await proxyFetchPost(
-          '/api/v1/login-by_stack?token=' + token,
-          {
-            token: token,
-          }
-        );
-
-        const errorMessage = getLoginErrorMessage(data);
-        if (errorMessage) {
-          recordSignInFailed({ reason: 'rejected', method: 'stack' });
-          setGeneralError(errorMessage);
-          return;
-        }
-        setModelType('cloud');
-        setAuth({ email: data.email, ...data });
-        const localProxyValue = import.meta.env.VITE_USE_LOCAL_PROXY || null;
-        setLocalProxyValue(localProxyValue);
-        navigate(redirectTo, { replace: true });
-      } catch (error: any) {
-        console.error('Login failed:', error);
-        recordSignInFailed({ reason: 'stack_error', method: 'stack' });
-        setGeneralError(
-          t('layout.login-failed-please-check-your-email-and-password')
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [
-      navigate,
-      setAuth,
-      setModelType,
-      setLocalProxyValue,
-      setGeneralError,
-      setIsLoading,
-      redirectTo,
-      getLoginErrorMessage,
-      t,
-    ]
-  );
-
-  const handleGetToken = useCallback(
-    async (code: string) => {
-      const code_verifier = localStorage.getItem('stack-oauth-outer-');
-      const formData = new URLSearchParams();
-      formData.append(
-        'redirect_uri',
-        import.meta.env.PROD
-          ? `${import.meta.env.VITE_BASE_URL}/api/v1/redirect/callback`
-          : `${import.meta.env.VITE_PROXY_URL}/api/v1/redirect/callback`
-      );
-      formData.append('code_verifier', code_verifier || '');
-      formData.append('code', code);
-      formData.append('grant_type', 'authorization_code');
-      formData.append('client_id', 'aa49cdd0-318e-46bd-a540-0f1e5f2b391f');
-      formData.append(
-        'client_secret',
-        'pck_t13egrd9ve57tz52kfcd2s4h1zwya5502z43kr5xv5cx8'
-      );
-
-      try {
-        const res = await fetch(
-          'https://api.stack-auth.com/api/v1/auth/oauth/token',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-            },
-            body: formData,
-          }
-        );
-        const data = await res.json();
-        return data.access_token;
-      } catch (error) {
-        console.error(error);
-        setIsLoading(false);
-      }
-    },
-    [setIsLoading]
-  );
-
-  const handleAuthCode = useCallback(
-    async (event: any, code: string) => {
-      if (lock || location.pathname !== '/login') return;
-
-      lock = true;
-      setIsLoading(true);
-      let accessToken = await handleGetToken(code);
-      handleLoginByStack(accessToken);
-      setTimeout(() => {
-        lock = false;
-      }, 1500);
-    },
-    [location.pathname, handleLoginByStack, handleGetToken, setIsLoading]
-  );
-
-  const handleTokenLogin = useCallback(
-    async (token: string) => {
-      if (!token) return;
-
-      setGeneralError('');
-      setIsLoading(true);
-      setModelType('cloud');
-      setAuth({ email: '', token, username: '', user_id: 0 });
-      setLocalProxyValue(import.meta.env.VITE_USE_LOCAL_PROXY || null);
-      try {
-        const userInfo = await proxyFetchGet('/api/v1/user');
-        if (userInfo && userInfo.email) {
-          setAuth({
-            token,
-            email: userInfo.email,
-            username:
-              userInfo.username ||
-              userInfo.nickname ||
-              userInfo.fullname ||
-              userInfo.email?.split('@')[0] ||
-              '',
-            user_id:
-              userInfo.id || JSON.parse(atob(token.split('.')[1])).id || 0,
-          });
-        }
-        navigate(redirectTo, { replace: true });
-      } catch (e) {
-        console.error('Failed to fetch user info:', e);
-        recordSignInFailed({
-          reason: 'user_fetch_error',
-          method: 'token',
-        });
-        setGeneralError(t('layout.login-failed-please-try-again'));
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [
-      navigate,
-      setAuth,
-      setGeneralError,
-      setIsLoading,
-      setLocalProxyValue,
-      setModelType,
-      redirectTo,
-      t,
-    ]
-  );
-
-  // Listen for direct token callback from Electron (eigent.ai login redirect)
-  useEffect(() => {
-    if (!host?.ipcRenderer) return;
-
-    const handleTokenReceived = async (_event: any, token: string) => {
-      await handleTokenLogin(token);
-    };
-
-    host.ipcRenderer.on('auth-token-received', handleTokenReceived);
-
-    return () => {
-      host.ipcRenderer?.off('auth-token-received', handleTokenReceived);
-    };
-  }, [handleTokenLogin, host]);
-
-  // Listen for auth code callback from Electron (Stack Auth OAuth flow)
-  useEffect(() => {
-    if (!host?.ipcRenderer) return;
-    host.ipcRenderer.on('auth-code-received', handleAuthCode);
-    return () => {
-      host.ipcRenderer?.off('auth-code-received', handleAuthCode);
-    };
-  }, [handleAuthCode, host]);
-
-  useEffect(() => {
-    if (IS_LOCAL_MODE || isDesktopHost) return;
-
-    const token = new URLSearchParams(location.search).get('token');
-    if (!token || handledWebTokenRef.current === token) return;
-
-    handledWebTokenRef.current = token;
-    handleTokenLogin(token);
-  }, [handleTokenLogin, isDesktopHost, location.search]);
-
-  useEffect(() => {
-    if (!host?.electronAPI?.getPlatform) {
-      return;
-    }
-    const p = host.electronAPI.getPlatform();
-    if (p === 'darwin') {
-      titlebarRef.current?.classList.add('mac');
-    }
-  }, [host]);
-
-  // Hybrid/app mode: prepare auth callback URL on mount (don't auto-open browser)
-  useEffect(() => {
-    if (IS_LOCAL_MODE) return;
-
-    const prepareCallbackUrl = async () => {
-      let cbUrl: string;
-      if (!isDesktopHost) {
-        cbUrl = getWebLoginCallbackUrl(window.location.origin);
-      } else if (import.meta.env.PROD) {
-        cbUrl = DESKTOP_LOGIN_CALLBACK_URL;
-      } else {
-        cbUrl = DESKTOP_LOGIN_CALLBACK_URL;
-        try {
-          const url = await host?.ipcRenderer?.invoke('get-auth-callback-url');
-          if (url) cbUrl = url;
-        } catch {
-          // Fallback to eigent:// protocol
-        }
-      }
-      setCallbackUrl(cbUrl);
-    };
-
-    prepareCallbackUrl();
-  }, [host, isDesktopHost]);
-
-  // Render local mode: "Start Eigent" button only
-  const renderLocalMode = () => (
-    <div className="relative flex w-80 flex-1 flex-col items-center justify-center pt-8">
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 text-ds-text-title font-bold">
-        M
-      </div>
-      <div className="mb-8 text-ds-text-display font-bold text-ds-ink-default-default">
-        Modex
-      </div>
-      {generalError && (
-        <p className="mt-1 mb-4 text-ds-text-body-large text-ds-text-status-error-strong-default">
-          {generalError}
-        </p>
-      )}
-      <Button
-        onClick={handleAutoLogin}
-        size="lg"
-        variant="primary"
-        className="w-full rounded-full"
-        disabled={isLoading}
-      >
-        <span className="flex-1">
-          {isLoading ? t('layout.logging-in') : '启动 Modex'}
-        </span>
-      </Button>
-    </div>
-  );
-
-  // Render hybrid/app mode: waiting for external login callback
-  const renderHybridMode = () => (
-    <div className="relative flex w-80 flex-1 flex-col items-center justify-center pt-8">
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 text-ds-text-title font-bold">
-        M
-      </div>
-      <div className="mb-4 text-ds-text-display font-bold text-ds-ink-default-default">
-        {t('layout.login')}
-      </div>
-      {isLoading && (
-        <p className="mb-6 text-center text-ds-text-body-large text-ds-ink-muted-default">
-          {t('layout.logging-in')}...
-        </p>
-      )}
-      <Button
-        onClick={() => {
-          setIsLoading(true);
-          const resolvedCallbackUrl =
-            callbackUrl ||
-            (isDesktopHost
-              ? DESKTOP_LOGIN_CALLBACK_URL
-              : getWebLoginCallbackUrl(window.location.origin));
-          const loginUrl = getExternalLoginUrl(resolvedCallbackUrl);
-
-          if (isDesktopHost) {
-            window.open(loginUrl, '_blank', 'noopener,noreferrer');
-            return;
-          }
-
-          window.location.assign(loginUrl);
-        }}
-        size="lg"
-        variant="primary"
-        className="w-full rounded-full"
-      >
-        <span className="flex-1">{t('layout.log-in')}</span>
-      </Button>
-    </div>
-  );
+  }
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden">
-      {/* Titlebar with drag region and window controls */}
-      <div
-        className="absolute top-0 right-0 left-0 z-50 flex !h-9 items-center justify-between py-1 pl-2"
-        id="login-titlebar"
-        ref={titlebarRef}
-        style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
-      >
-        {/* Center drag region */}
-        <div
-          className="flex h-full flex-1 items-center"
-          style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
-        >
-          <div className="h-10 flex-1"></div>
+    <main className="bg-background text-foreground flex min-h-screen items-center justify-center px-6">
+      <form onSubmit={submit} className="w-full max-w-sm space-y-5">
+        <div>
+          <h1 className="text-2xl font-semibold">Modex</h1>
+          <p className="text-muted-foreground mt-2 text-sm">
+            登录 ModelSwitch 账号
+          </p>
         </div>
-
-        {/* Right window controls */}
-        <div
-          style={
-            {
-              WebkitAppRegion: 'no-drag',
-              pointerEvents: 'auto',
-            } as React.CSSProperties
+        <label className="block text-sm">
+          账号
+          <input
+            autoComplete="username"
+            required
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
+            className="bg-background mt-2 h-10 w-full rounded-md border px-3"
+          />
+        </label>
+        <label className="block text-sm">
+          密码
+          <input
+            type="password"
+            autoComplete="current-password"
+            required
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            className="bg-background mt-2 h-10 w-full rounded-md border px-3"
+          />
+        </label>
+        {config?.turnstile_required && (
+          <Turnstile
+            key={challengeVersion}
+            siteKey={config.turnstile_site_key}
+            onToken={setChallenge}
+            onError={onChallengeError}
+          />
+        )}
+        {error && (
+          <p role="alert" className="text-destructive text-sm">
+            {error}
+          </p>
+        )}
+        <Button
+          type="submit"
+          disabled={
+            loading || !config || (config.turnstile_required && !challenge)
           }
-          onMouseDown={(e) => e.stopPropagation()}
-          onClick={(e) => e.stopPropagation()}
+          className="w-full"
         >
-          <WindowControls />
-        </div>
-      </div>
-
-      {/* Main content - image extends to top, form has padding */}
-      <div
-        className={`flex h-full items-center justify-center gap-2 px-1 pt-10 pb-1`}
-      >
-        <div
-          className="flex h-full min-h-0 w-full flex-col items-center justify-center overflow-hidden rounded-2xl bg-ds-neutral-subtle-default px-2 pb-2"
-          style={{
-            backgroundImage: `url(${background})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        >
-          {IS_LOCAL_MODE ? renderLocalMode() : renderHybridMode()}
-        </div>
-      </div>
-    </div>
+          {loading ? '登录中...' : '登录'}
+        </Button>
+      </form>
+    </main>
   );
 }

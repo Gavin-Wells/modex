@@ -1,3 +1,4 @@
+// Modified to avoid an initialization cycle in Modex.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +21,16 @@ import { resources } from './locales';
 
 export { LocaleEnum, resolveLocale } from './locale';
 
-const { language } = getAuthStore();
+function getSavedLanguage(): string | undefined {
+  try {
+    const saved = localStorage.getItem('auth-storage');
+    return saved ? JSON.parse(saved)?.state?.language : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+const language = getSavedLanguage();
 
 const systemLanguage = resolveLocale(navigator.language);
 const initialLanguage =

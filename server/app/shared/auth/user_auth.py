@@ -1,3 +1,4 @@
+# Modified for Modex account isolation.
 # ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -77,7 +78,7 @@ def _message(text: str) -> str:
 
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl=f"{env('url_prefix', '')}/v1/user/dev_login",
+    tokenUrl=f"{env('url_prefix', '')}/v1/user/modelswitch-password-login",
     auto_error=False,
 )
 
@@ -216,6 +217,8 @@ async def auth_must(
     user = db_session.get(User, model.id)
     if not user:
         raise TokenException(code.token_invalid, _message("User not found"))
+    if not user.stack_id or not user.stack_id.startswith("modelswitch:"):
+        raise TokenException(code.token_invalid, _message("ModelSwitch account required"))
     model._user = user
     return model
 

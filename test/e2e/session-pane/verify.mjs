@@ -44,7 +44,6 @@ const vite = await createServer({
   ],
   resolve: { alias: { '@': path.join(root, 'src') } },
   server: { host: '127.0.0.1', port: 0 },
-  optimizeDeps: { exclude: ['@stackframe/react'] },
 });
 let browser;
 try {

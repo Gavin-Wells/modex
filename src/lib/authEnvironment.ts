@@ -36,10 +36,10 @@ export function getAuthEnvironmentKey(): string {
     `base:${normalizeUrlIdentity(import.meta.env.VITE_BASE_URL)}`,
     `proxy:${normalizeUrlIdentity(import.meta.env.VITE_PROXY_URL)}`,
     `brain:${normalizeUrlIdentity(import.meta.env.VITE_BRAIN_ENDPOINT)}`,
-    `stack:${normalizeIdentityPart(import.meta.env.VITE_STACK_PROJECT_ID)}`,
+    'account:modelswitch',
   ];
   const key = parts.filter(Boolean).join('|');
-  return key || 'eigent:local-default';
+  return key || 'modex:local-default';
 }
 
 /** Non-secret ownership key for account-scoped background delivery. */

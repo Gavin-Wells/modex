@@ -13,7 +13,6 @@
 // limitations under the License.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
-import { proxyFetchPost } from '@/api/http';
 import { isDesktop } from '@/client/platform';
 import { useAuthStore } from '@/store/authStore';
 import {
@@ -28,13 +27,11 @@ import { LegacyRouteRedirect } from './LegacyRouteCompatibility';
 import WorkspaceSettingsRouteLayout from './WorkspaceSettingsRouteLayout';
 // Lazy load page components
 const Login = lazy(() => import('@/pages/Login'));
-const Signup = lazy(() => import('@/pages/SignUp'));
 const Workspace = lazy(() => import('@/pages/Workspace'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const RemoteControl = lazy(() => import('@/pages/RemoteControl'));
 
-const IS_LOCAL_MODE = import.meta.env.VITE_USE_LOCAL_PROXY === 'true';
 const ENABLE_DESKTOP_REMOTE_CONTROL_FALLBACK = isDesktop();
 
 interface AuthState {
@@ -75,16 +72,7 @@ const ProtectedRoute = () => {
     initialized: false,
   });
 
-  const {
-    token,
-    localProxyValue,
-    logout,
-    setAuth,
-    setLocalProxyValue,
-    setInitState,
-    setIsFirstLaunch,
-    setModelType,
-  } = useAuthStore();
+  const { token, localProxyValue, logout } = useAuthStore();
   useEffect(() => {
     // Check VITE_USE_LOCAL_PROXY value on app startup
     if (token) {
@@ -100,47 +88,8 @@ const ProtectedRoute = () => {
       }
     }
 
-    // Local mode: auto-login when no token
-    if (IS_LOCAL_MODE && !token) {
-      proxyFetchPost('/api/v1/user/auto-login', {})
-        .then((data) => {
-          if (data && data.token) {
-            setAuth({ email: data.email, ...data });
-            setLocalProxyValue(import.meta.env.VITE_USE_LOCAL_PROXY || null);
-            setModelType('custom');
-            setInitState('done');
-            setIsFirstLaunch(false);
-            dispatch({
-              type: 'INITIALIZE',
-              payload: { isAuthenticated: true },
-            });
-          } else {
-            dispatch({
-              type: 'INITIALIZE',
-              payload: { isAuthenticated: false },
-            });
-          }
-        })
-        .catch(() => {
-          dispatch({
-            type: 'INITIALIZE',
-            payload: { isAuthenticated: false },
-          });
-        });
-      return;
-    }
-
     dispatch({ type: 'INITIALIZE', payload: { isAuthenticated: !!token } });
-  }, [
-    token,
-    localProxyValue,
-    logout,
-    setAuth,
-    setLocalProxyValue,
-    setInitState,
-    setIsFirstLaunch,
-    setModelType,
-  ]);
+  }, [token, localProxyValue, logout]);
 
   if (state.loading || !state.initialized) {
     return (
@@ -192,10 +141,7 @@ function SettingsRouteRedirect() {
 const AppRoutes = () => (
   <Routes>
     <Route path="/login" element={<Login />} />
-    <Route
-      path="/signup"
-      element={IS_LOCAL_MODE ? <Navigate to="/login" replace /> : <Signup />}
-    />
+    <Route path="/signup" element={<Navigate to="/login" replace />} />
     {ENABLE_DESKTOP_REMOTE_CONTROL_FALLBACK ? (
       <Route path="/remote-control/:sessionId" element={<RemoteControl />} />
     ) : null}

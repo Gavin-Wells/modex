@@ -15,7 +15,7 @@
 """
 httpx wrapper that auto-injects X-Trace-ID header from context.
 
-All external calls (litellm, OAuth adapters, Stack Auth, Google Search)
+All external calls (litellm, OAuth adapters, Google Search)
 should route through this client for trace propagation.
 """
 
