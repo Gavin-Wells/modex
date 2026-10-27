@@ -1,3 +1,4 @@
+// Modified for Modex protocol and site configuration.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,13 +31,13 @@ describe('loginUtils', () => {
   });
 
   it('keeps the desktop callback URL on the custom protocol', () => {
-    expect(DESKTOP_LOGIN_CALLBACK_URL).toBe('eigent://auth/callback');
+    expect(DESKTOP_LOGIN_CALLBACK_URL).toBe('modex://auth/callback');
   });
 
   it('encodes the external login callback URL correctly', () => {
     // The site host is environment configuration, so assert the /signin path
     // and the encoded callback rather than pinning one deployment's hostname.
-    const siteUrl = import.meta.env.VITE_SITE_URL || 'https://www.eigent.ai';
+    const siteUrl = import.meta.env.VITE_SITE_URL || 'https://modelswitch.org';
     expect(getExternalLoginUrl('http://localhost:5173/login?from=web')).toBe(
       `${new URL('/signin', siteUrl).origin}/signin?callbackUrl=http%3A%2F%2Flocalhost%3A5173%2Flogin%3Ffrom%3Dweb`
     );

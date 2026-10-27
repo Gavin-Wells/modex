@@ -1,3 +1,4 @@
+// Modified for Modex local authentication.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -191,7 +192,10 @@ function SettingsRouteRedirect() {
 const AppRoutes = () => (
   <Routes>
     <Route path="/login" element={<Login />} />
-    <Route path="/signup" element={<Signup />} />
+    <Route
+      path="/signup"
+      element={IS_LOCAL_MODE ? <Navigate to="/login" replace /> : <Signup />}
+    />
     {ENABLE_DESKTOP_REMOTE_CONTROL_FALLBACK ? (
       <Route path="/remote-control/:sessionId" element={<RemoteControl />} />
     ) : null}
