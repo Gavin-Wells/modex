@@ -57,6 +57,7 @@ export function cliLaunchOptions(launch: ModelSwitchLaunch) {
         ANTHROPIC_DEFAULT_SONNET_MODEL: 'claude-sonnet-5-5',
         ANTHROPIC_DEFAULT_HAIKU_MODEL: 'claude-sonnet-5-5',
         ANTHROPIC_SMALL_FAST_MODEL: 'claude-sonnet-5-5',
+        CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST: '1',
         CLAUDE_CODE_USE_BEDROCK: '0',
         CLAUDE_CODE_USE_VERTEX: '0',
         CLAUDE_CODE_USE_FOUNDRY: '0',

@@ -16,6 +16,7 @@ describe('ModelSwitch CLI launch', () => {
       model: 'claude-opus-5-5',
     });
     expect(result.env.ANTHROPIC_AUTH_TOKEN).toBe('test-private-key');
+    expect(result.env.CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST).toBe('1');
     expect(result.env.ANTHROPIC_DEFAULT_HAIKU_MODEL).toBe('claude-sonnet-5-5');
     expect(JSON.stringify(result.args)).not.toContain('test-private-key');
   });
