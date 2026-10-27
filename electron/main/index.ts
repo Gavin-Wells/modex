@@ -142,6 +142,7 @@ import {
   getDefaultWorkspaceSecretVault,
   registerWorkspaceSecretIpcHandlers,
 } from './workspaceSecrets';
+import { WorkspaceServiceManager } from './workspaceService/manager';
 
 const userData = app.getPath('userData');
 
@@ -164,6 +165,37 @@ let backendPort: number = 5001;
 let backendStartPromise: Promise<BackendStartResult> | null = null;
 let brainStreamRelay: BrainStreamRelay | null = null;
 const localControlCapability = crypto.randomBytes(32).toString('base64url');
+function createWorkspaceService(): WorkspaceServiceManager | null {
+  if (!app.isPackaged) return null;
+  const root = path.join(process.resourcesPath, 'prebuilt');
+  try {
+    const runtime = JSON.parse(
+      fs.readFileSync(path.join(root, 'workspace-runtime.json'), 'utf8')
+    );
+    const resolveBundled = (value: unknown): string => {
+      if (typeof value !== 'string' || path.isAbsolute(value))
+        throw new Error('Invalid workspace runtime path');
+      const resolved = path.resolve(root, value);
+      if (!resolved.startsWith(`${root}${path.sep}`))
+        throw new Error('Workspace runtime path escapes bundle');
+      return resolved;
+    };
+    return new WorkspaceServiceManager({
+      python: resolveBundled(runtime.python),
+      pythonPath: resolveBundled(runtime.sitePackages),
+      redis: path.join(
+        root,
+        'redis',
+        process.platform === 'win32' ? 'redis-server.exe' : 'redis-server'
+      ),
+      serverDir: path.join(process.resourcesPath, 'workspace-server'),
+      stateDir: path.join(userData, 'workspace'),
+    });
+  } catch {
+    return null;
+  }
+}
+const workspaceService = createWorkspaceService();
 let desktopInstanceId: string | null = null;
 let browser_port = 9222;
 let use_external_cdp = false;
@@ -1016,6 +1048,17 @@ function registerIpcHandlers() {
     log,
   });
 
+  ipcMain.handle('workspace-service:get-endpoint', async (event) => {
+    if (!isMainRendererFrame(event) || !workspaceService)
+      throw new Error('Local workspace is unavailable');
+    return (await workspaceService.getConnection()).endpoint;
+  });
+  ipcMain.handle('workspace-service:get-capability', async (event) => {
+    if (!isMainRendererFrame(event) || !workspaceService)
+      throw new Error('Local workspace is unavailable');
+    return (await workspaceService.getConnection()).capability;
+  });
+
   // ==================== basic info handler ====================
   ipcMain.handle('get-browser-port', () => {
     log.info('Getting browser port');
@@ -1349,6 +1392,7 @@ function registerIpcHandlers() {
 
     // Clean up Python process first
     await cleanupPythonProcess();
+    await workspaceService?.dispose();
 
     // Schedule relaunch after a short delay
     setTimeout(() => {
@@ -4069,6 +4113,7 @@ app.on('before-quit', async (event) => {
 
     // Wait for Python process cleanup
     await cleanupPythonProcess();
+    await workspaceService?.dispose();
     await closeWorkspaceSecretBroker();
 
     // Clean up file reader if exists

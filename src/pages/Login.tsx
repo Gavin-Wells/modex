@@ -181,6 +181,11 @@ export default function Login() {
             onError={onChallengeError}
           />
         )}
+        {!config && !error && (
+          <p role="status" className="text-muted-foreground text-sm">
+            正在启动本地工作台...
+          </p>
+        )}
         {error && (
           <p role="alert" className="text-destructive text-sm">
             {error}

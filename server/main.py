@@ -118,8 +118,10 @@ LOG_FORMAT = "{time:YYYY-MM-DD HH:mm:ss} | {level} | {extra[trace_id]} | {messag
 loguru_logger.configure(extra={"trace_id": "-"})
 loguru_logger.remove()
 loguru_logger.add(sys.stderr, level="DEBUG", filter=trace_filter, format=LOG_FORMAT, diagnose=False, backtrace=False)
+local_data_dir = os.environ.get("MODEX_WORKSPACE_DATA_DIR")
+log_path = pathlib.Path(local_data_dir) / "logs" / "app.log" if local_data_dir else pathlib.Path("runtime/log/app.log")
 loguru_logger.add(
-    "runtime/log/app.log",
+    log_path,
     rotation="10 MB",
     retention="10 days",
     level="DEBUG",

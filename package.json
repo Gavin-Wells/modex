@@ -27,6 +27,7 @@
     "prebuild:deps": "npm run preinstall-deps && npm run compile-babel && npm run fix-venv-paths && npm run fix-symlinks",
     "prebuild:deps:clean": "npm run prebuild:deps && npm run clean-symlinks",
     "prebuild:compile": "tsc -p tsconfig.build.json && vite build",
+    "prebuild:workspace": "node scripts/prebuild-workspace.js",
     "prebuild": "npm run prebuild:deps:clean && npm run prebuild:compile",
     "prebuild:win": "npm run prebuild:deps && npm run prebuild:compile",
     "build": "npm run prebuild && electron-builder --publish never",

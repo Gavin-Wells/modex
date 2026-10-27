@@ -49,6 +49,7 @@ def configure_local_environment(state_dir: Path, redis_url: str, capability: str
         "TOKEN_AUDIENCE": "modex-local-api",
         "url_prefix": "/api",
         "CORS_ALLOW_ORIGINS": "null",
+        "PUBLIC_DIR": str(state_dir.resolve() / "public"),
         "MODEX_WORKSPACE_CAPABILITY": capability,
     }
 

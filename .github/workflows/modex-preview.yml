@@ -26,14 +26,38 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           version: '0.9.26'
+      - uses: actions/checkout@v4
+        with:
+          repository: valkey-io/valkey
+          ref: 55a542671762eaddff979f78dc6a3d1414ce1d75
+          path: .build/valkey
       - run: npm install --no-audit --no-fund
       - run: npm test -- --run test/unit/modelswitchCli.test.ts test/unit/modelswitchTerminal.test.tsx
       - run: npm run prebuild
         env:
           USE_NPM_INSTALL_BUN: 'true'
+      - run: npm run prebuild:workspace
+      - name: Build local cache service
+        run: |
+          make -C .build/valkey -j2 valkey-server MALLOC=libc BUILD_TLS=no
+          mkdir -p resources/prebuilt/redis
+          cp .build/valkey/src/valkey-server resources/prebuilt/redis/redis-server
+          cp .build/valkey/COPYING resources/prebuilt/redis/LICENSE
+      - name: Verify bundled workspace service
+        run: |
+          export MODEX_TEST_WORKSPACE_PYTHON="$PWD/resources/prebuilt/$(node -p "require('./resources/prebuilt/workspace-runtime.json').python")"
+          export MODEX_TEST_WORKSPACE_SITE_PACKAGES="$PWD/resources/prebuilt/$(node -p "require('./resources/prebuilt/workspace-runtime.json').sitePackages")"
+          export MODEX_TEST_WORKSPACE_REDIS="$PWD/resources/prebuilt/redis/redis-server"
+          export MODEX_TEST_WORKSPACE_SERVER="$PWD/server"
+          npm test -- --run test/unit/workspaceServiceManager.test.ts test/unit/workspaceServiceVerify.test.ts
       - run: npx electron-builder --mac dmg --${{ matrix.arch }} --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Verify packaged application startup
+        run: |
+          export MODEX_APP_EXECUTABLE="$(find release -path '*/Modex.app/Contents/MacOS/Modex' -type f -print -quit)"
+          test -n "$MODEX_APP_EXECUTABLE"
+          node test/e2e/modex-packaged-smoke.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: modex-macos-${{ matrix.arch }}-preview

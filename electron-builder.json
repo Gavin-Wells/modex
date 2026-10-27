@@ -32,6 +32,21 @@
   ],
   "extraResources": [
     {
+      "from": "server",
+      "to": "workspace-server",
+      "filter": [
+        "main.py",
+        "modex_local.py",
+        "alembic.ini",
+        "alembic/**/*",
+        "app/**/*.py",
+        "app/**/*.json",
+        "lang/**/*",
+        "!**/__pycache__/**",
+        "!**/*.pyc"
+      ]
+    },
+    {
       "from": "backend",
       "to": "backend",
       "filter": ["**/*", "!.venv/**/*", "!workspace/.initial_env/**/*"]
@@ -45,6 +60,10 @@
         "!**/.npm-cache/**/*",
         "!uv_python/**/*.pyc",
         "!uv_python/**/__pycache__",
+        "!workspace_venv/bin/**",
+        "!workspace_venv/Scripts/**",
+        "!workspace_venv/**/__pycache__/**",
+        "!workspace_venv/**/*.pyc",
         "!terminal_venv/**/*.pyc",
         "!terminal_venv/**/__pycache__",
         "!**/__pycache__/**",

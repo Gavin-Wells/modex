@@ -69,6 +69,10 @@ __pycache__/
 resources/prebuilt/bin/
 resources/prebuilt/venv/
 resources/prebuilt/cache/
+resources/prebuilt/workspace_python/
+resources/prebuilt/workspace_venv/
+resources/prebuilt/workspace-runtime.json
+resources/prebuilt/redis/
 
 *storybook.log
 storybook-static
