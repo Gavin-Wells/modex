@@ -190,7 +190,7 @@
     "shadow-plugin": "2.1.0",
     "storybook": "^10.1.11",
     "tailwindcss": "4.3.3",
-    "typescript": "5.9.3",
+    "typescript": "7.0.2",
     "vite": "^5.4.11",
     "vite-plugin-electron": "^0.29.0",
     "vite-plugin-electron-renderer": "^0.14.6",
