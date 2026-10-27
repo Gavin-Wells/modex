@@ -12,8 +12,7 @@
 // limitations under the License.
 // ========= Copyright 2025-2026 @ Eigent.ai All Rights Reserved. =========
 
-import logoBlack from '@/assets/logo/logo_black.png';
-import logoWhite from '@/assets/logo/logo_white.png';
+import modexLogo from '../../../../build/modex.png';
 import { Button } from '@/components/ui/button';
 import { DsIcon } from '@/components/ui/ds-icon';
 import useAppVersion from '@/hooks/use-app-version';
@@ -23,7 +22,6 @@ import {
 } from '@/hooks/useDesktopUpdater';
 import { useHost } from '@/host';
 import { SITE_URL } from '@/lib';
-import { useAuthStore } from '@/store/authStore';
 import { useDesktopUpdateStore } from '@/store/updateStore';
 import { Download, ExternalLink, RefreshCw, TagIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -35,8 +33,6 @@ import SettingsSectionPage from '../SettingsSectionPage';
 
 export function AboutSettings() {
   const { t } = useTranslation();
-  const appearance = useAuthStore((state) => state.appearance);
-  const logoSrc = appearance === 'dark' ? logoWhite : logoBlack;
   const host = useHost();
   const ipcRenderer = host?.ipcRenderer;
   const version = useAppVersion();
@@ -54,7 +50,7 @@ export function AboutSettings() {
           size="sm"
           onClick={() =>
             window.open(
-              'https://github.com/eigent-ai/eigent',
+              'https://github.com/Gavin-Wells/modex',
               '_blank',
               'noopener,noreferrer'
             )
@@ -146,9 +142,9 @@ export function AboutSettings() {
     <SettingsSectionPage>
       <SettingsRowGroup>
         <SettingsRow
-          title="Eigent"
+          title="Modex"
           description={t('setting.official-website', {
-            defaultValue: 'Official Eigent website.',
+            defaultValue: 'Official Modex website.',
           })}
           action={
             <button
@@ -158,7 +154,7 @@ export function AboutSettings() {
               }
               className="flex cursor-pointer items-center gap-3 bg-transparent transition-opacity duration-200 hover:opacity-60"
             >
-              <img src={logoSrc} alt="Eigent" className="h-7 w-auto" />
+              <img src={modexLogo} alt="Modex" className="h-7 w-auto" />
               <DsIcon icon={ExternalLink} aria-hidden />
             </button>
           }
