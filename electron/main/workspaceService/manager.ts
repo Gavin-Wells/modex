@@ -120,7 +120,7 @@ export class WorkspaceServiceManager {
     try {
       const redis = spawn(this.paths.redis, [this.redisConfig], {
         stdio: 'ignore',
-        env: { PATH: process.env.PATH || '' } as NodeJS.ProcessEnv,
+        env: { PATH: process.env.PATH || '', APP_ROOT: '', VITE_PUBLIC: '' },
       });
       this.redis = redis;
       redis.on('error', () => {});
