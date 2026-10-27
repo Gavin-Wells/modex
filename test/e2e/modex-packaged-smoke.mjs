@@ -6,7 +6,13 @@ const executablePath = process.env.MODEX_APP_EXECUTABLE;
 if (!executablePath) throw new Error('MODEX_APP_EXECUTABLE is required');
 const app = await electron.launch({ executablePath, timeout: 120000 });
 try {
-  const page = await app.firstWindow({ timeout: 120000 });
+  let page;
+  const deadline = Date.now() + 120000;
+  while (Date.now() < deadline && !page) {
+    page = app.windows().find((item) => item.url().startsWith('file:') && item.url().includes('/dist/index.html'));
+    if (!page) await new Promise((resolve) => setTimeout(resolve, 200));
+  }
+  if (!page) throw new Error(`Main window not found: ${app.windows().map((item) => item.url()).join(', ')}`);
   const upstream = [];
   const errors = [];
   const consoleErrors = [];
