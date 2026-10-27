@@ -20,7 +20,7 @@
 //     (OS keychain backed) and never leaves the user's machine.
 //   - Non-sensitive metadata (status, label, expiry) is stored in plaintext
 //     alongside the ciphertext so the UI can render status without decrypting.
-//   - File lives under ~/.eigent/<tempEmail>/codex-auth.json, mode 0600.
+//   - File lives under ~/.modex/<tempEmail>/codex-auth.json, mode 0600.
 //
 // This module is intentionally free of any Codex endpoint / OAuth-flow detail
 // so it can land ahead of the P0-1 spike. It only persists/restores whatever

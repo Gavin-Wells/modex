@@ -814,13 +814,11 @@ def _risk_tags(
         ):
             tags.add("untrusted_script")
         lowered_parts = tuple(part.lower() for part in candidate.parts)
-        if ".eigent" in lowered_parts:
-            eigent_index = lowered_parts.index(".eigent")
-            if (
-                len(lowered_parts) > eigent_index + 1
-                and lowered_parts[eigent_index + 1] == "skills"
-            ):
-                tags.add("untrusted_script")
+        for control_root in (".eigent", ".modex"):
+            if control_root in lowered_parts:
+                control_index = lowered_parts.index(control_root)
+                if len(lowered_parts) > control_index + 1 and lowered_parts[control_index + 1] == "skills":
+                    tags.add("untrusted_script")
         if candidate.name.lower() in _CONTROL_PLANE_FILENAMES:
             tags.add("policy_control_plane")
     command_text = (

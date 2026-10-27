@@ -1289,6 +1289,11 @@ def test_auto_executed_workspace_files_and_commands_are_not_auto_reviewed(
             "filesystem.write",
             {"path": ".eigent/skills/run.py"},
         ),
+        (
+            ".modex/skills/run.py",
+            "filesystem.write",
+            {"path": ".modex/skills/run.py"},
+        ),
     ]
 
     for name, operation, arguments in cases:
